@@ -7,7 +7,7 @@
 [RAG]([url](https://github.com/Cinnamon/kotaemon?fbclid=IwZXh0bgNhZW0CMTEAAR073NOr1D5vC-irSMi62p12mAQQAeSFhFse5inJi_yYdyrPO_GVHYW2eMs_aem_0hI0_57G77VXU4zSduZfog)) 
 
 **TO DO**
-
+- https://youtu.be/klTvEwg3oJ4
 - Benchmark NLP models
 - Make Front END & Back END of PangutanAI
 - CONVERT data set(handbook.txt)
