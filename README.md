@@ -6,6 +6,8 @@ Research Congress Butuan (dl - September 30) - https://docs.google.com/forms/d/e
 
 **TO DO**
 
-Benchmark NLP models
+ *Benchmark NLP models
+ *Make Front END & Back END of PangutanAI
+CONVERT data set(handbook.txt)
 
-Make Front END & Back END of PangutanAI
+
