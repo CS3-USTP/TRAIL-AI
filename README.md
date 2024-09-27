@@ -6,6 +6,8 @@
 
 [RAG](https://github.com/Cinnamon/kotaemon?fbclid=IwZXh0bgNhZW0CMTEAAR073NOr1D5vC-irSMi62p12mAQQAeSFhFse5inJi_yYdyrPO_GVHYW2eMs_aem_0hI0_57G77VXU4zSduZfog)
 
+[Student Handbook Embedding](https://docs.google.com/spreadsheets/d/1N5O_9oGi8VmcuZmo1JktbHs2Eey0KJcX_erez-9y9VM/edit?fbclid=IwZXh0bgNhZW0CMTEAAR1Bz7MwdsmV1pd8KGMTJY_EvOuAp52pyiqWMzFwlXeE1PVlyb5YGaLxXxA_aem_8g8iwKyOBZdYlhuQVyuPDg&gid=0#gid=0)
+
 **TO DO**
 - https://youtu.be/klTvEwg3oJ4
 - Benchmark NLP models
