@@ -1,22 +1,36 @@
-### PANGUTANAI
+# PANGUTANAI
 
+## Draft Paper
+This project involves the development of PangutanAI, with a focus on Natural Language Processing (NLP) models and student handbook embedding.
 
-[Draft Paper](https://docs.google.com/document/d/14y_vxCUHfFJCvGa-FVbWc1Jk76Ka_gIfsQcyNoen9co/edit)
+### Extension Project (Deadline: September 30)
+- Task for DEDS (Deadline: September 30)
+  
+### Research Congress Butuan (Deadline: September 30)
+- Contribution to the Research Congress event in Butuan.
 
-[Extension Project](https://drive.google.com/drive/folders/1fLntq6izrCCeQ0tr94jWqT_hNYm7uFZu?fbclid=IwZXh0bgNhZW0CMTEAAR2AmjexRLdnkTY5_o7bpuGs3IOHwhJmz9sh3PAlwStavDEZIjo2UbZ9Ht0_aem_k_K6eR_L30XBqYyckb8_9Q) (dl - September 30) - deds
+### RAG
+- Involvement with RAG.
 
-[Research Congress Butuan](https://docs.google.com/forms/d/e/1FAIpQLSdGS9pRgJNCp9SQ4itDwQhNARQvnlY7Lkj_cWA4G9Ta2VeiAg/viewform?fbclid=IwZXh0bgNhZW0CMTEAAR1XfWkq5K2oe14aAx4nVsOqu2bvACNDu8PzPN-xFmclJpa4k2cNhNI5pko_aem_5OX4DzRYGF8usUJWA2ji-A) (dl - September 30) 
+### Student Handbook Embedding
+- Embedding of the student handbook into the project.
 
-[RAG](https://github.com/Cinnamon/kotaemon?fbclid=IwZXh0bgNhZW0CMTEAAR073NOr1D5vC-irSMi62p12mAQQAeSFhFse5inJi_yYdyrPO_GVHYW2eMs_aem_0hI0_57G77VXU4zSduZfog)
+## TO-DO List
 
-[Student Handbook Embedding](https://docs.google.com/spreadsheets/d/1N5O_9oGi8VmcuZmo1JktbHs2Eey0KJcX_erez-9y9VM/edit?fbclid=IwZXh0bgNhZW0CMTEAAR1Bz7MwdsmV1pd8KGMTJY_EvOuAp52pyiqWMzFwlXeE1PVlyb5YGaLxXxA_aem_8g8iwKyOBZdYlhuQVyuPDg&gid=0#gid=0)
+1. **Benchmark NLP Models**
+   - Evaluate various NLP models to determine the best for the project.
 
-**TO DO**
-- https://youtu.be/klTvEwg3oJ4
-- Benchmark NLP models
-- Make Front END & Back END of PangutanAI
-- CONVERT data set(handbook.txt)
+2. **Make Front END & Back END of PangutanAI**
+   - Develop both the front-end and back-end components of the PangutanAI system.
 
-**Note**
-- Hugging Face models benchmarking
-- niga niga
+3. **CONVERT Data Set (handbook.txt)**
+   - Convert the data from `handbook.txt` to a suitable format for integration into the project.
+
+4. **Note**
+   - Make sure to keep track of any other important notes.
+
+---
+
+## Useful Links
+
+- [YouTube Video](https://youtu.be/klTvEwg3oJ4)
