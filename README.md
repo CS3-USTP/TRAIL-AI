@@ -1,36 +1,48 @@
-# PANGUTANAI
+# 🤖 PANGUTANAI
 
-## Draft Paper
-This project involves the development of PangutanAI, with a focus on Natural Language Processing (NLP) models and student handbook embedding.
+## 📦 Requirements
+- ⚙️ **Ollama** - For running LLMs
+- 📊 **ChromaDB** - For data ingestion
+- 🔮 **DeepSeek R1** - For generation
+- 🧠 **all-mpnet-base-v2** - For embeddings
+- 🐍 **Python 3.12** - For testing
+- 🦕 **Deno 2.x** - For JS runtime
+- 🌐 **Next.js** - For web application
 
-### Extension Project (Deadline: September 30)
-- Task for DEDS (Deadline: September 30)
-  
-### Research Congress Butuan (Deadline: September 30)
-- Contribution to the Research Congress event in Butuan.
+---
 
-### RAG
-- Involvement with RAG.
+## 📄 Draft Paper
+This project involves the development of **PangutanAI**, focusing on Natural Language Processing (NLP) models and student handbook embedding.
 
-### Student Handbook Embedding
-- Embedding of the student handbook into the project.
+---
 
-## TO-DO List
+### 📅 Extension Project (Deadline: September 30)
+- 🔧 **Task for DEDS** (Deadline: September 30)
 
-1. **Benchmark NLP Models**
-   - Evaluate various NLP models to determine the best for the project.
+### 🎓 Research Congress Butuan (Deadline: September 30)
+- 📢 **Contribution** to the Research Congress event in Butuan.
 
-2. **Make Front END & Back END of PangutanAI**
+### 🔗 RAG
+- 🤝 **Involvement** with RAG.
+
+### 📘 Student Handbook Embedding
+- 🔍 **Embedding** of the student handbook into the project.
+
+---
+
+## ✅ TO-DO List
+
+1. **🚀 Benchmark NLP Models**  
+   - Evaluate various NLP models to determine the best fit for the project.
+
+2. **💻 Make Front END & Back END of PangutanAI**  
    - Develop both the front-end and back-end components of the PangutanAI system.
 
-3. **CONVERT Data Set (handbook.txt)**
-   - Convert the data from `handbook.txt` to a suitable format for integration into the project.
-
-4. **Note**
+3. **📝 Note**  
    - Make sure to keep track of any other important notes.
 
 ---
 
-## Useful Links
+## 🔗 Useful Links
 
-- [YouTube Video](https://youtu.be/klTvEwg3oJ4)
+- 🎥 [YouTube Video](https://youtu.be/klTvEwg3oJ4)
