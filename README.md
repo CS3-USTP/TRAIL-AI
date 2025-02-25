@@ -3,11 +3,50 @@
 ## 📦 Requirements
 - ⚙️ **Ollama** - For running LLMs
 - 📊 **ChromaDB** - For data ingestion
-- 🔮 **DeepSeek R1** - For generation
+- 🔮 **DeepSeek-R1-Distill-Llama-8B** - For generation
 - 🧠 **all-mpnet-base-v2** - For embeddings
 - 🐍 **Python 3.12** - For testing
 - 🦕 **Deno 2.x** - For JS runtime
 - 🌐 **Next.js** - For web application
+
+
+---
+
+## 🛠️ Setup
+
+### 1️⃣ Install **Deno 2.0**
+#### 🖥️ Windows
+Run the following command in PowerShell:
+```powershell
+irm https://deno.land/install.ps1 | iex
+```
+
+#### 🐧 macOS & Linux
+Follow the official Deno installation guide: [Deno Docs](https://docs.deno.com/runtime/getting_started/installation/)
+
+---
+
+## 📦 Install Dependencies
+Run:
+```sh
+deno install
+```
+
+---
+
+## ▶️ Run the App
+Start the application with:
+```sh
+deno run dev
+```
+
+---
+
+## 🤝 Contributing
+1. Fork the repository 🍴
+2. Create a new branch 🌱
+3. Commit your changes 📌
+4. Submit a pull request 🔄
 
 ---
 
