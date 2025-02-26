@@ -3,7 +3,7 @@
 ## 📦 Requirements
 - ⚙️ **Ollama** - For running LLMs
 - 📊 **ChromaDB** - For data ingestion
-- 🔮 **DeepSeek-R1-Distill-Llama-8B** - For generation
+- 🔮 **llama3.2** - For generation
 - 🧠 **all-mpnet-base-v2** - For embeddings
 - 🐍 **Python 3.12** - For testing
 - 🦕 **Deno 2.x** - For JS runtime
