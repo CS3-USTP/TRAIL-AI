@@ -1,14 +1,13 @@
 {
     "name": "pangutanai",
     "version": "0.1.0",
-    "private": true,
+    "private": false,
     "scripts": 
     {
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
-        "chat": "deno run --allow-net src/lib/ollama/main.ts"
+        "lint": "next lint"
     },
     "dependencies": 
     {
