@@ -35,7 +35,7 @@ while True:
     query_embedding = model.encode(query_text, device=device, convert_to_numpy=True, normalize_embeddings=True)
 
     # Query ChromaDB
-    results = collection.query(query_embeddings=[query_embedding.tolist()], n_results=5)
+    results = collection.query(query_embeddings=[query_embedding.tolist()], n_results=10)
 
     # Print results
     print(json.dumps(results, indent=4, sort_keys=True))

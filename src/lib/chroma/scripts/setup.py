@@ -13,7 +13,7 @@ model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1").to(device)
 documents = []
 ids = []
 
-with open("chunks.csv", "r", encoding="utf-8") as file:
+with open("data/chunks.csv", "r", encoding="utf-8") as file:
     
     reader = csv.reader(file)
     for index, row in enumerate(reader):

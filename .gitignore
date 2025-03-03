@@ -4,6 +4,7 @@
 venv/
 
 # chromadb (database) 
+__pycache__/
 db/
 chroma.log
 
