@@ -1,6 +1,7 @@
 import json
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from sentence_transformers import SentenceTransformer
 from chromadb import PersistentClient
 from pydantic import BaseModel
@@ -19,8 +20,7 @@ collection = client.get_collection("ustp_handbook_2023")
 
 class QueryRequest(BaseModel):
     query: str
-    n_results: int = 10
-    
+
 @app.get("/")
 def read_root() -> Dict[str, str]:
     """Welcome message."""
@@ -30,12 +30,22 @@ def read_root() -> Dict[str, str]:
 def query_metadata(doc_id: str) -> Dict[str, Any]:
     """Retrieve a document by its metadata ID."""
     results = collection.get(ids=[doc_id])
-    return results if results.get("documents") else {"error": "Document not found"}
+    
+    if not results.get("documents"):
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    return results
 
 @app.post("/semantic-search")
 def semantic_search(request: QueryRequest) -> Dict[str, Any]:
-    """Perform semantic search and return only relevant results (distance < 1)."""
+    """Perform semantic search and return only relevant results (distance < threshold)."""
     
+    n_results = 20
+    threshold = 0.94
+    document = ""
+    reference = ""
+    distance = ""
+
     # Generate the query embedding
     query_embedding = model.encode(
         request.query, 
@@ -47,13 +57,8 @@ def semantic_search(request: QueryRequest) -> Dict[str, Any]:
     # Perform search in ChromaDB
     response = collection.query(
         query_embeddings=[query_embedding.tolist()], 
-        n_results=request.n_results
+        n_results=n_results
     )
-
-    threshold = 1
-    document = ""
-    reference = ""
-    distance = ""
     
     for chunk in zip(
         response["documents"][0], 
@@ -74,11 +79,19 @@ def semantic_search(request: QueryRequest) -> Dict[str, Any]:
     document  = document.strip()
     distance  = distance[:-2]
     reference = reference[:-2]
-    
+
     if not document:
-        return {"error": "No relevant results found"}
-    return {
-            "document":  document,
+        return JSONResponse(
+            content={"success": False, "message": "No relevant results found."},
+            status_code=200  # Keeping status as 200 to indicate a successful request
+        )
+
+    return JSONResponse(
+        content={
+            "success": True,
+            "document": document,
             "reference": reference,
-            "distance":  distance
-        }
+            "distance": distance
+        },
+        status_code=200
+    )
