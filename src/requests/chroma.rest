@@ -1,0 +1,14 @@
+
+### Debug Message
+
+Get http://localhost:8000/
+
+
+### Semantic Search Request
+POST http://localhost:8000/semantic-search
+Content-Type: application/json
+
+{
+    "query": "introduction",
+    "n_results": 10
+}

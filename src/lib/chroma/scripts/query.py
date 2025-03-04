@@ -13,7 +13,7 @@ model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1").to(device)
 
 # Connect to ChromaDB
 print("Connecting to ChromaDB...")
-client = PersistentClient(path="db")  # Store data persistently
+client = PersistentClient(path="../db")  # Store data persistently
 collection_name = "ustp_handbook_2023"
 
 # Get the collection
