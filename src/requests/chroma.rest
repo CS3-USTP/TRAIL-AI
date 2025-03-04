@@ -9,6 +9,6 @@ POST http://localhost:8000/semantic-search
 Content-Type: application/json
 
 {
-    "query": "introduction",
+    "query": "why is the sky blue",
     "n_results": 10
 }
