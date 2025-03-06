@@ -1,8 +1,6 @@
 
 import ollama from 'ollama';
 
-
-// Retrieve context from Chroma API
 type ContextType = {
     success: boolean,
     document: string,
@@ -11,7 +9,6 @@ type ContextType = {
 }
 
 async function retrieveContext(query: string): Promise<ContextType> {
-
     const chroma_api = "http://localhost:8000/semantic-search";
     const response = await fetch(chroma_api, {
         method: 'POST',
@@ -21,89 +18,65 @@ async function retrieveContext(query: string): Promise<ContextType> {
         body: JSON.stringify({ query }),
     });
 
-    // Return the context from the response
     return await response.json();
 } 
 
-// Generate a response based on the given query and context
-async function generateResponse(query: string): Promise<void> {
+async function generateSystemContext(query: string): Promise<string> {
+    let command: string = 
+    "You are Neuro, an AI assistant developed by the Computer Science Student Society (CS3) at the University of Science and Technology of Southern Philippines (USTP).";
 
-    let context: ContextType;
-    try {
-        // get relevant context from chroma
-        context = await retrieveContext(query);
-    }
-    catch (error: any) {
-        console.error(error);
-        return;
-    }
-    
-    let system: string = 
-    `"You are Neuro, an AI assistant developed by the Computer Science Student Society (CS3) at the University of Science and Technology of Southern Philippines (USTP). Your role is to assist and inform students, faculty, and staff by providing accurate, concise, and helpful responses.
-    You prioritize factual correctness, clarity, and relevance to university policy related topics. When answering, maintain a professional yet approachable tone. If a query is outside your scope, politely redirect users to the appropriate university resources.
-    `;
+    let context: ContextType = await retrieveContext(query);
 
     if (!context.success) {
-        system += 
+        command += 
         `
+
         Politely tell the user that the student handbook does not have information about "${query}". 
-        Don't provide details or ask to look for it. Ask if they have questions related to the student handbook instead.
+        Ask if they have questions related to the student handbook instead.
         `;
     }
     else {
-        system += `
+        command += 
+        `
+
         Choose the related information on the handbook to answer the user's query "${query}".
-        If not found on the handbook, don't provide details or ask to look for it and politely tell the user that it does not contain the information.   
+        If in doubt or it is not found on the handbook, do not provide details or ask to look for it then politely tell the user that it does not contain the information.   
 
         Handbook: "${context.document}"`;
     }
 
-    // llama model
-    // const prompt = `
-    //     <|system|>${system}<|end|>
-    //     <|user|>${query}<|end|>
-    //     <|assistant|>
-    // `;
+    return command;
+}
 
-    //phi model
-    // const prompt = `
-    // <|im_start|>system<|im_sep|>
-    // ${system}<|im_end|>
-    // <|im_start|>user<|im_sep|>
-    // ${query}<|im_end|>
-    // <|im_start|>assistant<|im_sep|>
-    // `;
+async function generateResponse(query: string): Promise<void> {
 
-    // mistral model
-    const prompt = `
-    [INST] ${system ? `${system}\n\n` : ""}User: ${query} [/INST]
-    `;
-
-    console.info(context.distance);
-    console.info(context.reference);
-    console.info(prompt);
-
-    // Stream the response using Ollama
-    const stream = await ollama.generate({
-        model: "mistral",
-        prompt: prompt,
-        stream: true,
-        raw: true,
-        options: {
-            temperature: 0.9,     // Less creative, more focused
-            top_p: 0.9,           // Conservative token selection
-            // temperature: 0.7   // Balances creativity and coherence.
-            // top_p: 1.0         // Allows the model to consider a wide range of token choices.
+    let messages = [
+        { 
+            role: "system", 
+            content: await generateSystemContext(query) 
         },
-    });
+        {
+            role: "user",
+            content: query
+        }
+    ];
 
-    // Collect the streamed response
-    let finalResponse = '';
+    const stream = await ollama.chat(
+        {
+            options: {
+                temperature: 0.9,    // Less creative, more focused
+                top_p: 0.9,          // Conservative token selection
+            },
+            model: "mistral", 
+            stream: true,
+            messages
+        }
+    );
+
     for await (const part of stream) {
-        const encoded = new TextEncoder().encode(part.response);
-        process.stdout.write(encoded);
-        finalResponse += part;
+        process.stdout.write(part.message.content)
     }
+
 }
 
 // unethical, should refer to policies instead of refusing
