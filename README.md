@@ -61,7 +61,7 @@ deno run dev
 
 ## 📄 Draft Paper
 
-This project involves the development of **PangutanAI**, focusing on Natural Language Processing (NLP) models and student handbook embedding.
+This project involves the development of **Trail AI**, focusing on Natural Language Processing (NLP) models and student handbook embedding.
 
 ---
 
