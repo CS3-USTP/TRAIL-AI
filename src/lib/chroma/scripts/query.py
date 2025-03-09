@@ -9,7 +9,11 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
 
 print("Loading the model...")
-model = SentenceTransformer("mixedbread-ai/mxbai-embed-large-v1").to(device)
+model = SentenceTransformer(
+    "NovaSearch/stella_en_400M_v5",
+    trust_remote_code=True,
+    device=device   
+)
 
 # Connect to ChromaDB
 print("Connecting to ChromaDB...")
@@ -32,7 +36,7 @@ while True:
     print("Processing query...")
 
     # Encode the query
-    query_embedding = model.encode(query_text, device=device, convert_to_numpy=True, normalize_embeddings=True)
+    query_embedding = model.encode(query_text, device=device, convert_to_numpy=True, normalize_embeddings=True, prompt_name="s2p_query")
 
     # Query ChromaDB
     results = collection.query(query_embeddings=[query_embedding.tolist()], n_results=10)
