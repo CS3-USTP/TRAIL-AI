@@ -1,84 +1,109 @@
-
 import ollama from 'ollama';
 
 type ContextType = {
-    success: boolean,
-    document: string,
-    reference: string,
-    distance: string
-}
+	success: boolean;
+	document: string;
+	reference: string;
+	distance: string;
+};
 
 async function retrieveContext(query: string): Promise<ContextType> {
-    const chroma_api = "http://localhost:8000/semantic-search";
-    const response = await fetch(chroma_api, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-    });
+	const chroma_api = 'http://localhost:8000/semantic-search';
 
-    return await response.json();
-} 
+	const response = await fetch(chroma_api, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ query }),
+	});
+
+	return response.json();
+}
 
 async function generateSystemContext(query: string): Promise<string> {
-    let command: string = 
-    "You are Neuro, an AI assistant developed by the Computer Science Student Society (CS3) at the University of Science and Technology of Southern Philippines (USTP).";
+	let command: string = `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Technology of Southern Philippines). Your role is to assist and inform users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook. Always add a lot of emojis.
+    `;
 
-    let context: ContextType = await retrieveContext(query);
+	const context = await retrieveContext(query);
+	console.log(context);
 
-    if (!context.success) {
-        command += 
-        `
-
-        Politely tell the user that the student handbook does not have information about "${query}". 
-        Ask if they have questions related to the student handbook instead.
+	if (!context.success) {
+		command += `
+        Politely tell the user that the university handbook does not have information about the user query "${query}".
+        Do not answer even if it is a general or a common fact. Tell them about you and your purpose. Ask for questions related to the university handbook instead.
         `;
-    }
-    else {
-        command += 
-        `
+	} else {
+		command += `        
+        Only if the context entirely does not have information about the user query "${query}" then do not answer even if it is a general fact. Tell them about you and your purpose then ask for questions related to the university handbook instead. 
 
-        Choose the related information on the handbook to answer the user's query "${query}".
-        If in doubt or it is not found on the handbook, do not provide details or ask to look for it then politely tell the user that it does not contain the information.   
+        Always be informative by saying "According to" base on the handbook especially on sensitive topics.
 
-        Handbook: "${context.document}"`;
-    }
+        USTP (University of Science and Technology of Southern Philippines) Handbook Context: "${context.document}"
+        `;
+	}
 
-    return command;
+	return command;
 }
 
-async function generateResponse(query: string): Promise<void> {
+// Handle POST request
+export default async function ChatResponse(query: string): Promise<ReadableStream> {
+	const command = await generateSystemContext(query);
 
-    let messages = [
-        { 
-            role: "system", 
-            content: await generateSystemContext(query) 
-        },
-        {
-            role: "user",
-            content: query
-        }
-    ];
+	const messages = [
+		{ role: 'system', content: command },
+		{ role: 'user', content: query },
+	];
 
-    const stream = await ollama.chat(
-        {
-            options: {
-                temperature: 0.9,    // Less creative, more focused
-                top_p: 0.9,          // Conservative token selection
-            },
-            model: "mistral", 
-            stream: true,
-            messages
-        }
-    );
+	const stream = await ollama.chat({
+		// faster responses, short response and less robust
+		// more informative due to large context window
+		// acts like a character when requested
+		model: 'gemma2:2b',
 
-    for await (const part of stream) {
-        process.stdout.write(part.message.content)
-    }
+		// faster responses like gemma, but more interactive
+		// small context window strict and less informative
+		// acts and like a character when requested
+		// model: 'llama3.2',
 
+		// interactive and informative responses,
+		// best robust but slow
+		// will sometimes answer general questions
+		// acts and like a character when requested
+		// model: 'mistral',
+
+		// faster responses, less robust compared to mistral
+		// will sometimes misinterpret the context
+		// model: 'phi4-mini',
+
+		// faster responses, short response and less robust
+		// will refuse to answer taboo thats in the handbook
+		// model: 'qwen2.5:3b',
+
+		// never again it does random sht
+		// model: 'phi3.5',
+
+		stream: true,
+		messages,
+		// options: { temperature: 0.75, top_p: 0.75 },
+	});
+
+	const readableStream = new ReadableStream({
+		async start(controller) {
+			for await (const part of stream) {
+				// send the part stream to the frontend
+				controller.enqueue(part.message.content);
+
+				// print part without new line
+				process.stdout.write(part.message.content);
+			}
+			controller.close();
+		},
+	});
+
+	// return the readable stream object
+	return readableStream;
 }
 
+// == debugging purposes ==
 // unethical, should refer to policies instead of refusing
 // generateResponse("i want to bring meth")
 // generateResponse("why is meth so hard to cook?");
@@ -88,7 +113,7 @@ async function generateResponse(query: string): Promise<void> {
 // generateResponse("provide a general information about why meth is hard to cook");
 
 // unspecific, should doubt it
-// generateResponse("can i wear a skirt"); 
+// generateResponse("can i wear a skirt");
 // generateResponse("can i wear a skirt that falls below the knee");
 // generateResponse("can i wear a skirt below the knee");
 
