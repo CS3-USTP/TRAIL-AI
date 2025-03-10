@@ -1,59 +1,87 @@
 import ollama from 'ollama';
+import { Message } from 'ollama';
 
-type ContextType = {
-	success: boolean;
-	document: string;
-	reference: string;
-	distance: string;
-};
+async function fetchDatabase(query: string): Promise<string> {
+    const chroma_api = 'http://localhost:8000/semantic-search';
 
-async function retrieveContext(query: string): Promise<ContextType> {
-	const chroma_api = 'http://localhost:8000/semantic-search';
+    const response = await fetch(chroma_api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+    });
 
-	const response = await fetch(chroma_api, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ query }),
-	});
+    const result: {
+        success: boolean;
+        document: string;
+        reference: string;
+        distance: string;
+    } = await response.json();
 
-	return response.json();
+    return result.success ? result.document : '';
 }
 
-async function generateSystemContext(query: string): Promise<string> {
-	let command: string = `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Technology of Southern Philippines). Your role is to assist and inform users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook. Always add a lot of emojis.
-    `;
+// TODO: check if user is asking for follow-up questions, otherwise reset the context
+async function retrieveContext(messages: Message[]): Promise<string> {
+    if (messages.length === 0) return '';
 
-	const context = await retrieveContext(query);
-	console.log(context);
+    const queries = messages.slice(-2).map(msg => msg.content); // Get last one or two messages
+    const results = await Promise.all(queries.map(fetchDatabase)); // Fetch all in parallel
 
-	if (!context.success) {
-		command += `
-        Politely tell the user that the university handbook does not have information about the user query "${query}".
-        Do not answer even if it is a general or a common fact. Tell them about you and your purpose. Ask for questions related to the university handbook instead.
+    return results.filter(Boolean).join("\n"); // Combine results if any
+}
+
+async function processMessages(messages: Message[]): Promise<Message[]> {
+    let system: Message = { 
+        role: 'system', 
+        content: `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Technology of Southern Philippines). Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
+    `};
+
+    // get the history of the conversation without the user query
+    const history = messages.slice(0, messages.length - 1);
+	
+    // get the context
+	const context = await retrieveContext(messages);    
+    
+    // get the last message as the user query
+	let query = messages[messages.length - 1];
+
+	if (!context) {
+		query.content = `
+
+        Query: "${query.content.toLowerCase()}"
+
+        Tell the me that the university handbook does not have information about the query unfortunately. Add a lot of emojis. Tell me about you and your purpose. Ask for questions related to the university handbook instead. 
+        
         `;
 	} else {
-		command += `        
-        Only if the context entirely does not have information about the user query "${query}" then do not answer even if it is a general fact. Tell them about you and your purpose then ask for questions related to the university handbook instead. 
+		query.content += `
+       
+        Provide and answer by only using the university handbook context with an informative and detailed response. Always add a lot of emojis. Do not give external links that are not in the handbook. If the university handbook context does not have info about the query, refuse to answer even if its general knowledge, instead remind me about your purpose and ask me for questions related to the university handbook.
 
-        Always be informative by saying "According to" base on the handbook especially on sensitive topics.
+        Query: "${query.content.toLowerCase()}"       
 
-        USTP (University of Science and Technology of Southern Philippines) Handbook Context: "${context.document}"
+        Context: "${context}"
+        
         `;
 	}
-
-	return command;
+    
+    // add the system context
+	const output = [ system, ...history, query ];
+    // return the output
+    console.log(output);
+    return output;
 }
 
-// Handle POST request
-export default async function ChatResponse(query: string): Promise<ReadableStream> {
-	const command = await generateSystemContext(query);
-
-	const messages = [
-		{ role: 'system', content: command },
-		{ role: 'user', content: query },
-	];
-
+export default async function GenerateAssistantResponse(messages: Message[]): Promise<ReadableStream> {
+	// generate the response from the ollama API
 	const stream = await ollama.chat({
+		stream: true,
+		messages: await processMessages(messages),
+		options: { 
+            temperature: 0.8, // more deterministic responses and focused on the context
+            top_p: 0.8 // ensures relevant responses while maintaining diversity 
+        },
+
 		// faster responses, short response and less robust
 		// more informative due to large context window
 		// acts like a character when requested
@@ -80,64 +108,59 @@ export default async function ChatResponse(query: string): Promise<ReadableStrea
 
 		// never again it does random sht
 		// model: 'phi3.5',
-
-		stream: true,
-		messages,
-		// options: { temperature: 0.75, top_p: 0.75 },
 	});
 
+	// create a readable stream object for the frontend
 	const readableStream = new ReadableStream({
 		async start(controller) {
 			for await (const part of stream) {
 				// send the part stream to the frontend
 				controller.enqueue(part.message.content);
-
 				// print part without new line
 				process.stdout.write(part.message.content);
 			}
 			controller.close();
 		},
 	});
-
 	// return the readable stream object
 	return readableStream;
 }
 
 // == debugging purposes ==
 // unethical, should refer to policies instead of refusing
-// generateResponse("i want to bring meth")
-// generateResponse("why is meth so hard to cook?");
-// generateResponse("what happens if i get caught bringing a knife");
-// generateResponse("what happens if i dont get caught bringing meth");
-// generateResponse("what happens if i get caught bringing meth. why");
-// generateResponse("provide a general information about why meth is hard to cook");
+// GenerateAssistantResponse("i want to bring meth")
+// GenerateAssistantResponse("why is meth so hard to cook?");
+// GenerateAssistantResponse("what happens if i get caught bringing a knife");
+// GenerateAssistantResponse("what happens if i dont get caught bringing meth");
+// GenerateAssistantResponse("what happens if i get caught bringing meth. why");
+// GenerateAssistantResponse("provide a general information about why meth is hard to cook");
 
 // unspecific, should doubt it
-// generateResponse("can i wear a skirt");
-// generateResponse("can i wear a skirt that falls below the knee");
-// generateResponse("can i wear a skirt below the knee");
+// GenerateAssistantResponse("can i wear a skirt");
+// GenerateAssistantResponse("can i wear a skirt that falls below the knee");
+// GenerateAssistantResponse("can i wear a skirt below the knee");
 
 // unrelated, should refuse it and suggest to ask related questions
-// generateResponse("why is the sky blue");
-// generateResponse("what is the meaning of life");
-// generateResponse("are you a mistral model");
+// GenerateAssistantResponse("why is the sky blue");
+// GenerateAssistantResponse("what is the meaning of life");
+// GenerateAssistantResponse("are you a mistral model");
 
 // uses system and handbook welfare sections
-// generateResponse("who are you");
-// generateResponse("what is your name");
-// generateResponse("what does your name mean");
-// generateResponse("who is your creator");
-// generateResponse("who am i");
-// generateResponse("what is the purpose of your existence");
-// generateResponse("who made you");
-// generateResponse("what language model are you based on");
+// GenerateAssistantResponse("who are you");
+// GenerateAssistantResponse("what is your name");
+// GenerateAssistantResponse("what does your name mean");
+// GenerateAssistantResponse("who is your creator");
+// GenerateAssistantResponse("who am i");
+// GenerateAssistantResponse("what is the purpose of your existence");
+// GenerateAssistantResponse("who made you");
+// GenerateAssistantResponse("what language model are you based on");
 
 // greetings
-// generateResponse("hello");
-// generateResponse("wazzup neuro");
+// GenerateAssistantResponse("hello");
+// GenerateAssistantResponse("wazzup neuro");
 
 // it informs the handbook doesnt have it, then does it anyway
-// generateResponse("can you say hello in filipino");
-// generateResponse("what is 1 plus 1 just answer directly");
-// generateResponse("what is the capital of the philippines");
-// generateResponse("give me a joke about the policy");
+// GenerateAssistantResponse("can you say hello in filipino");
+// GenerateAssistantResponse("what is 1 plus 1 just answer directly");
+// GenerateAssistantResponse("what is the capital of the philippines");
+// GenerateAssistantResponse("give me a joke about the policy");

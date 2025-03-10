@@ -1,0 +1,18 @@
+
+POST http://localhost:3000/api/generate
+Content-Type: application/json
+
+[
+    {
+        "role": "user",
+        "content": "why is the sky blue"
+    },
+    {
+        "role": "assistant",
+        "content": "The sky is blue because of the way the Earth's atmosphere scatters sunlight."
+    },
+        {
+        "role": "user",
+        "content": "why is the sky blue"
+    }
+]

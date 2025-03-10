@@ -2,9 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react';
 
+type MessageType = {
+	role: 'user' | 'assistant';
+	content: string;
+};
+
 export default function ChatPage() {
 	const [query, setQuery] = useState('');
-	const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+	const [messages, setMessages] = useState<MessageType[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 
@@ -44,19 +49,26 @@ export default function ChatPage() {
 		if (!query.trim()) return;
 
 		const userMessage = query.trim();
-		setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+		// Add user message to the messages array
+		const updatedMessages: MessageType[] = [...messages, { role: 'user', content: userMessage }];
+		setMessages(updatedMessages);
 		setQuery('');
 		setError('');
 		setLoading(true);
 
 		try {
 			// Add empty assistant message to show typing indicator
-			setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+			setMessages([...updatedMessages, { role: 'assistant', content: '' }]);
+
+			// Get the last 3 messages to send to API
+			const lastMessages = updatedMessages.slice(-3);
+
+            console.log(lastMessages);
 
 			const res = await fetch('/api/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: userMessage }),
+				body: JSON.stringify(lastMessages),
 			});
 
 			if (!res.ok) throw new Error(`Server responded with ${res.status}`);
