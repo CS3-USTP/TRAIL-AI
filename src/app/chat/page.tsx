@@ -65,7 +65,7 @@ export default function ChatPage() {
 
             console.log(lastMessages);
 
-			const res = await fetch('/api/chat', {
+			const res = await fetch('/chat/api', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(lastMessages),
