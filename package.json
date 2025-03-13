@@ -8,7 +8,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "chroma": "src\\lib\\chroma\\venv\\Scripts\\uvicorn src.lib.chroma.main:app --host 0.0.0.0 --port 8000"
+        "database": "src\\lib\\database\\venv\\Scripts\\uvicorn src.lib.chroma.main:app --host 0.0.0.0 --port 8000"
     },
     "dependencies": 
     {
