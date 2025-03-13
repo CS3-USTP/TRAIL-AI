@@ -1,0 +1,484 @@
+[
+    { 
+        "premise": "is it allowed",                 
+        "hypothesis": "why not",  
+        "coherence": true
+    },
+    { 
+        "premise": "why not",                       
+        "hypothesis": "is it allowed", 
+        "coherence": true
+    },
+    { 
+        "premise": "can i wear a skirt",            
+        "hypothesis": "can i wear blue jeans", 
+        "coherence": false
+    },
+    { 
+        "premise": "can i wear a skirt",            
+        "hypothesis": "if its long", 
+        "coherence": true
+    },
+    { 
+        "premise": "can i wear a skirt",            
+        "hypothesis": "can i access it", 
+        "coherence": true
+    },
+    { 
+        "premise": "dog is barking it",             
+        "hypothesis": "animal is noisy", 
+        "coherence": true
+    },
+    { 
+        "premise": "animal is noisy",               
+        "hypothesis": "dog is barking it", 
+        "coherence": true
+    },
+    { 
+        "premise": "can i wear a skirt",            
+        "hypothesis": "can i hack", 
+        "coherence": false
+    },
+    { 
+        "premise": "why is the sky blue",           
+        "hypothesis": "just tell me", 
+        "coherence": true
+    },
+    { 
+        "premise": "why is the sky blue",           
+        "hypothesis": "what does that mean", 
+        "coherence": true
+    },
+    { 
+        "premise": "just tell me",                  
+        "hypothesis": "why is the sky blue", 
+        "coherence": false
+    },
+    { 
+        "premise": "can i hack",                    
+        "hypothesis": "my friend got caught what will they do", 
+        "coherence": true
+    },
+    { 
+        "premise": "what does ustp mean",           
+        "hypothesis": "why is the sky blue", 
+        "coherence": false
+    },
+    { 
+        "premise": "hello",                         
+        "hypothesis": "what are you", 
+        "coherence": true
+    },
+    { 
+        "premise": "hello",                         
+        "hypothesis": "who are you", 
+        "coherence": true
+    },
+    { 
+        "premise": "what are you",                  
+        "hypothesis": "what does ustp mean", 
+        "coherence": true
+    },
+    { 
+        "premise": "she bought a laptop yesterday", 
+        "hypothesis": "she is an expert in programming", 
+        "coherence": false
+    },
+    { 
+        "premise": "what is the time",              
+        "hypothesis": "its barking loudly", 
+        "coherence": false
+    },
+    { 
+        "premise": "its barking loudly",            
+        "hypothesis": "what is the time", 
+        "coherence": false
+    },
+    { 
+        "premise": "what is cs3 who are they",      
+        "hypothesis": "what is their goal", 
+        "coherence": true
+    },
+    { 
+        "premise": "what is their goal",            
+        "hypothesis": "i dont have enough money to continue studying", 
+        "coherence": false
+    },
+    { 
+        "premise": "a man eats something",          
+        "hypothesis": "a man is driving down the road", 
+        "coherence": false
+    },
+    
+        { 
+        "premise": "Are students required to wear uniforms?",            
+        "hypothesis": "Is the dress code mandatory?", 
+        "coherence": true
+    },
+    { 
+        "premise": "Final exams are scheduled in the last week of the semester.",            
+        "hypothesis": "Students will have exams in the final week.", 
+        "coherence": true
+    },
+    { 
+        "premise": "Students must maintain a minimum GPA to stay in their program.",            
+        "hypothesis": "A low GPA can lead to academic probation.", 
+        "coherence": true
+    },
+    { 
+        "premise": "The library is open 24/7 for students.",            
+        "hypothesis": "The library closes at 10 PM.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Plagiarism results in academic penalties.",            
+        "hypothesis": "Plagiarism is encouraged for creative projects.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Students are allowed to bring outside food to the cafeteria.",            
+        "hypothesis": "Outside food is strictly prohibited in the cafeteria.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "The student council election will be held next month.",            
+        "hypothesis": "The university recently introduced new parking rules.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Midterm exams cover the first half of the semester's lessons.",            
+        "hypothesis": "The university gym offers yoga classes every Friday.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Students can request an academic transcript online.",            
+        "hypothesis": "The campus bookstore sells second-hand textbooks.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Students can access the library with their university ID.",            
+        "hypothesis": "The football team won the championship last year.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Professors must submit final grades within two weeks after exams.",            
+        "hypothesis": "The cafeteria offers a discount for reusable containers.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "The university provides free counseling services for students.",            
+        "hypothesis": "Tuition fees are coherence to increase next semester.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Final-year students must complete a capstone project.",            
+        "hypothesis": "The university shuttle service runs every 30 minutes.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Lab equipment must be handled with care and returned after use.",            
+        "hypothesis": "The university has partnered with a local company for internships.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Students must maintain a minimum GPA to retain their scholarships.",            
+        "hypothesis": "The gym is open from 6 AM to 10 PM on weekdays.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "All research proposals must be approved by the ethics committee.",            
+        "hypothesis": "The university bookstore has a new collection of hoodies.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Late submission of assignments may result in grade deductions.",            
+        "hypothesis": "Students can apply for dormitory accommodation online.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Professors are required to hold at least two office hours per week.",            
+        "hypothesis": "The computer lab requires a reservation for weekend use.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Graduation ceremonies are held twice a year, in June and December.",            
+        "hypothesis": "Students can bring guests to the university cafeteria.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "What are the university’s policies on attendance?",            
+        "hypothesis": "Students must attend at least 80% of their classes.", 
+        "coherence": true
+    },
+    { 
+        "premise": "Can students request an extension on assignments?",            
+        "hypothesis": "Professors may grant extensions under special circumstances.", 
+        "coherence": true
+    },
+    { 
+        "premise": "What is the penalty for missing a final exam?",            
+        "hypothesis": "Final exam absences require a valid excuse and rescheduling.", 
+        "coherence": false
+    },
+    { 
+        "premise": "Students must complete all prerequisite courses before enrolling in advanced subjects.",            
+        "hypothesis": "Can I take Advanced Calculus without passing Basic Calculus?", 
+        "coherence": false 
+    },
+    { 
+        "premise": "The university has a strict no-smoking policy on campus.",            
+        "hypothesis": "Where are the designated smoking areas?", 
+        "coherence": false 
+    },
+    { 
+        "premise": "Graduating students must settle all outstanding fees.",            
+        "hypothesis": "Can I receive my diploma if I have unpaid tuition?", 
+        "coherence": true
+    },
+    { 
+        "premise": "What does that mean?",            
+        "hypothesis": "Can you explain it in simpler terms?", 
+        "coherence": true
+    },
+    { 
+        "premise": "How does that work?",            
+        "hypothesis": "Give me an example.", 
+        "coherence": true
+    },
+    { 
+        "premise": "Is that allowed?",            
+        "hypothesis": "Can you clarify the rules?", 
+        "coherence": true
+    },
+    { 
+        "premise": "What happens next?",            
+        "hypothesis": "Walk me through the process.", 
+        "coherence": true
+    },
+    { 
+        "premise": "Why is that important?",            
+        "hypothesis": "Can you elaborate on its significance?", 
+        "coherence": true
+    },
+    { 
+        "premise": "Students must submit their theses before the deadline.",            
+        "hypothesis": "Does the cafeteria serve vegetarian options?", 
+        "coherence": false 
+    },
+    { 
+        "premise": "The university encourages students to join extracurricular activities.",            
+        "hypothesis": "The computer lab has the latest gaming consoles.", 
+        "coherence": false 
+    },
+    { 
+        "premise": "All first-year students must attend orientation.",            
+        "hypothesis": "The library has an extensive collection of science fiction books.", 
+        "coherence": false 
+    },
+    
+
+        { 
+            "premise": "is it allowed",                 
+            "hypothesis": "the moon is bright",  
+            "coherence": false
+        },
+        { 
+            "premise": "do i need permission",                 
+            "hypothesis": "the door was open yesterday",  
+            "coherence": true
+        },
+        { 
+            "premise": "where do i go",                 
+            "hypothesis": "sometimes things just fall apart",  
+            "coherence": false
+        },
+        { 
+            "premise": "can i wear shorts",                 
+            "hypothesis": "birds migrate south in winter",  
+            "coherence": false
+        },
+        { 
+            "premise": "who decides",                 
+            "hypothesis": "I had cereal this morning",  
+            "coherence": false
+        },
+        { 
+            "premise": "is this important",                 
+            "hypothesis": "shadows move when the sun sets",  
+            "coherence": false
+        },
+        { 
+            "premise": "when does it start",                 
+            "hypothesis": "the fish was bigger than expected",  
+            "coherence": false
+        },
+        { 
+            "premise": "what do i need",                 
+            "hypothesis": "glass shatters under pressure",  
+            "coherence": false
+        },
+        { 
+            "premise": "should i be worried",                 
+            "hypothesis": "the library is usually quiet",  
+            "coherence": false
+        },
+        { 
+            "premise": "can i leave",                 
+            "hypothesis": "sometimes the wind feels different",  
+            "coherence": false
+        },
+        { 
+            "premise": "how strict is it",                 
+            "hypothesis": "there are no blue oranges",  
+            "coherence": false
+        },
+        { 
+            "premise": "what if i don’t",                 
+            "hypothesis": "paper burns at 451 degrees Fahrenheit",  
+            "coherence": false
+        },
+        { 
+            "premise": "do i need to follow the rule",                 
+            "hypothesis": "the ocean is full of mysteries",  
+            "coherence": false
+        },
+        { 
+            "premise": "can i access it",                 
+            "hypothesis": "some people like pineapples on pizza",  
+            "coherence": false
+        },
+        { 
+            "premise": "why not",                 
+            "hypothesis": "clouds form when moisture rises",  
+            "coherence": false
+        },
+
+
+        
+            { 
+                "premise": "can i do that",                 
+                "hypothesis": "if no one sees",  
+                "coherence": true
+            },
+            { 
+                "premise": "how does it work",                 
+                "hypothesis": "it just does",  
+                "coherence": true
+            },
+            { 
+                "premise": "where do i go",                 
+                "hypothesis": "depends",  
+                "coherence": true
+            },
+            { 
+                "premise": "what happens next",                 
+                "hypothesis": "you’ll see",  
+                "coherence": true
+            },
+            { 
+                "premise": "is there a rule",                 
+                "hypothesis": "some say there is",  
+                "coherence": true
+            },
+            { 
+                "premise": "should i be worried",                 
+                "hypothesis": "maybe not",  
+                "coherence": true
+            },
+            { 
+                "premise": "do i need permission",                 
+                "hypothesis": "not necessarily",  
+                "coherence": true
+            },
+            { 
+                "premise": "can i wear shorts",                 
+                "hypothesis": "if the weather says so",  
+                "coherence": true
+            },
+            { 
+                "premise": "when does it start",                 
+                "hypothesis": "after it begins",  
+                "coherence": true
+            },
+            { 
+                "premise": "who decides",                 
+                "hypothesis": "the one who knows",  
+                "coherence": true
+            },
+            { 
+                "premise": "how strict is it",                 
+                "hypothesis": "depends on who asks",  
+                "coherence": true
+            },
+            { 
+                "premise": "what if i don’t",                 
+                "hypothesis": "then you don’t",  
+                "coherence": true
+            },
+            { 
+                "premise": "can i leave",                 
+                "hypothesis": "if you must",  
+                "coherence": true
+            },
+            { 
+                "premise": "does this matter",                 
+                "hypothesis": "not to everyone",  
+                "coherence": true
+            },
+            { 
+                "premise": "what do i need",                 
+                "hypothesis": "whatever works",  
+                "coherence": true
+            },
+        
+        
+
+    { 
+        "premise": "The coffee spilled everywhere.",                 
+        "hypothesis": "The table is kind of messy now.",  
+        "coherence": true
+    },
+    { 
+        "premise": "He got first place in the race.",                    
+        "hypothesis": "Guess he was, like, the fastest or something.",  
+        "coherence": true
+    },
+    { 
+        "premise": "She turned off the lights.",                    
+        "hypothesis": "So, uh, it's dark now?",  
+        "coherence": true
+    }   ,
+        { 
+        "premise": "It's super cold outside.",                  
+        "hypothesis": "I dunno, feels kinda warm though?",  
+        "coherence": true
+    },
+    { 
+        "premise": "She always wakes up early.",                   
+        "hypothesis": "But, like, she was asleep at noon yesterday?",  
+        "coherence": true
+    },
+    { 
+        "premise": "The bus arrived on time.",                   
+        "hypothesis": "Yeah but people were still late somehow.",  
+        "coherence": true
+    },
+    { 
+        "premise": "He finished his homework.",                   
+        "hypothesis": "I mean, his cat was just sitting there.",  
+        "coherence": false
+    },
+    { 
+        "premise": "The sky is turning orange.",                   
+        "hypothesis": "So, uh, pancakes are good, right?",  
+        "coherence": false
+    },
+    { 
+        "premise": "She packed her bags for the trip.",                   
+        "hypothesis": "I dunno, maybe she'll eat pizza later.",  
+        "coherence": false
+    }
+
+
+
+]
