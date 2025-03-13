@@ -1,4 +1,4 @@
-# 🤖 PANGUTANAI
+# 🤖 TRAIL AI
 
 ## 📦 Requirements
 
@@ -6,6 +6,8 @@
 -  📊 **ChromaDB** - For data ingestion
 -  🔮 **gemma2:2b** - For generation
 -  🧠 **stella_en_400M_v5** - For embeddings
+-  🔰 **ms-marco-MiniLM-L6-v2** - For reranking
+-  💬 **nli-deberta-v3-large** - For coherence
 -  🐍 **Python 3.12** - For testing
 -  🦕 **Deno 2.x** - For JS runtime
 -  🌐 **Next.js** - For web application
