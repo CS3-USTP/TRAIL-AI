@@ -1,5 +1,7 @@
 import ollama from 'ollama';
 import { Message } from 'ollama';
+import { Response } from '@types/chroma';
+import { Coherence } from '@/types/coherence';
 
 async function fetchDatabase(query: string): Promise<string> {
     const chroma_api = 'http://localhost:8000/semantic-search';
@@ -10,30 +12,66 @@ async function fetchDatabase(query: string): Promise<string> {
         body: JSON.stringify({ query }),
     });
 
-    const result: {
-        success: boolean;
-        document: string;
-        reference: string;
-        distance: string;
-    } = await response.json();
+    const result: Response = await response.json();
 
     return result.success ? result.document : '';
 }
 
-// TODO: check if user is asking for follow-up questions, otherwise reset the context
+
+async function fetchCoherence(premise: string, hypothesis: string): Promise<boolean> {
+    const coherence_api = 'http://localhost:8000/coherence-check';
+
+    const response = await fetch(coherence_api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ premise, hypothesis }),
+    });
+
+    const result: Coherence = await response.json();
+    return result.coherence;
+
+}
+
 async function retrieveContext(messages: Message[]): Promise<string> {
-    if (messages.length === 0) return '';
+    
+    // check if there is only one message
+    if (messages.length === 1) {
+        // fetch the database with the message content
+        const { role, content } = messages[0];
+        const context = `${role}: ${content}`;
+        const response = await fetchDatabase(context);
+        return response;
+    }
 
-    const queries = messages.slice(-2).map(msg => msg.content); // Get last one or two messages
-    const results = await Promise.all(queries.map(fetchDatabase)); // Fetch all in parallel
+    // expect only 3 messages
+    else if (messages.length !== 3)
+        throw new Error('Invalid number of messages');
 
-    return results.filter(Boolean).join("\n"); // Combine results if any
+    // check if previous query is coherent with the new query
+    const oldQuery = messages[messages.length - 3];
+    const newQuery = messages[messages.length - 1];
+    const coherence = await fetchCoherence(oldQuery.content, newQuery.content);
+
+    console.log('\n\nCoherence: ', coherence, '\n\n');
+
+    let context = "";
+    if (coherence) {
+        // if coherent, combine the messages
+        context = messages.map(message => `${message.role}: ${message.content}`).join('\n\n');
+    }
+    else {
+        // get the last message as the user query instead
+        const message = messages[messages.length - 1];
+        context = `${message.role}: ${message.content}`;
+    }
+    const response = await fetchDatabase(context);
+    return response;
 }
 
 async function processMessages(messages: Message[]): Promise<Message[]> {
     let system: Message = { 
         role: 'system', 
-        content: `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Technology of Southern Philippines). Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
+        content: `Your name is Neuro, an AI assistant developed by the CS3 (COMPUTER SCIENCE STUDENT SOCIETY) - a student organization at USTP (UNIVERSITY OF SCIENCE AND TECHNOLOGY OF SOUTHERN PHILIPPINES). Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
     `};
 
     // get the history of the conversation without the user query
@@ -65,10 +103,7 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
         `;
 	}
     
-    // add the system context
 	const output = [ system, ...history, query ];
-    // return the output
-    console.log(output);
     return output;
 }
 

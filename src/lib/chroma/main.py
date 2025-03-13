@@ -1,6 +1,8 @@
+from src.lib.coherence.main import predict
 import json
 import torch
 import asyncio
+from joblib import load
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from sentence_transformers import SentenceTransformer, CrossEncoder
@@ -25,12 +27,14 @@ embedding_model = SentenceTransformer(
     device=device   
 )
 
-coherence_model = CrossEncoder(
+semantic_model = CrossEncoder(
     "cross-encoder/nli-deberta-v3-large",
     trust_remote_code=True,
     device=device
 )
 
+coherence_model = load("src/lib/coherence/model.joblib")
+    
 # --------------- ThreadPoolExecutor to offload blocking tasks --------------- #
 
 executor = ThreadPoolExecutor(max_workers=4)
@@ -78,32 +82,23 @@ async def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
     # Run model prediction asynchronously in the executor
     results = await asyncio.get_running_loop().run_in_executor(
         executor, 
-        lambda: coherence_model.predict([(premise, hypothesis)])
+        lambda: semantic_model.predict([(premise, hypothesis)])
     )
     # model can bulk queries, we take the first query result
-    scores = results[0].tolist()
+    values = results[0].tolist()
     
-    # # get the highest score 
-    # score = max(scores)
-        
-    # # get the highest score index in the scores list
-    # max_index = scores.index(score)
+    coherence = predict(coherence_model, [values])
     
-    # # get the category of the highest score index
-    # categories = ["contradiction", "neutral", "entailment"]
-    # category = categories[max_index]    
-     
-    return JSONResponse(
-        content={
-            "results": [
-                {"category": "contradiction", "score": scores[0]},
-                {"category": "neutral", "score": scores[1]},
-                {"category": "entailment", "score": scores[2]}
-            ]
-        },
-        status_code=200
-    )
-    
+    return JSONResponse(content={
+        "coherence": coherence,
+        "values": {
+            "contradiction": values[0],
+            "neutral":       values[1],
+            "entailment":    values[2]
+        }
+        }, 
+        status_code=200)
+
 
 @app.get("/query-metadata/{doc_id}")
 async def query_metadata(doc_id: str) -> Dict[str, Any]:  # ✅ Now async
@@ -123,7 +118,7 @@ async def query_metadata(doc_id: str) -> Dict[str, Any]:  # ✅ Now async
 async def semantic_search(request: QueryRequest) -> Dict[str, Any]:  # ✅ Now async
     """Perform semantic search and return only relevant results (distance < threshold)."""
 
-    n_results = 10
+    n_results = 20
     threshold = 1.35
     document = ""
     reference = ""
@@ -132,7 +127,7 @@ async def semantic_search(request: QueryRequest) -> Dict[str, Any]:  # ✅ Now a
     # ✅ Offload embedding generation to avoid blocking
     query_embedding = await asyncio.get_running_loop().run_in_executor(
         executor,
-        lambda: model.encode(request.query, prompt_name="s2p_query", convert_to_numpy=True, normalize_embeddings=True)
+        lambda: embedding_model.encode(request.query, prompt_name="s2p_query", convert_to_numpy=True, normalize_embeddings=True)
     )
 
     # ✅ Offload ChromaDB query to avoid blocking
@@ -157,6 +152,18 @@ async def semantic_search(request: QueryRequest) -> Dict[str, Any]:  # ✅ Now a
     reference = reference[:-2]
 
     if not document:
-        return JSONResponse(content={"success": False, "message": "No relevant results found."}, status_code=200)
+        return JSONResponse(
+            content={
+                "success": False, 
+                "message": "No relevant results found."
+            }, status_code=200
+            )
 
-    return JSONResponse(content={"success": True, "document": document, "reference": reference, "distance": distance}, status_code=200)
+    return JSONResponse(
+        content={
+            "success": True, 
+            "document": document, 
+            "reference": reference, 
+            "distance": distance
+        }, status_code=200
+        )
