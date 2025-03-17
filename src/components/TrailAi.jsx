@@ -13,7 +13,7 @@ const GeminiBody = () => {
 
       {/* Gemini text and CircleUserIcon section */}
       <div className='flex items-center justify-between p-5 text-xl text-gray-400'> {/* justify between is used so that there is gap between circleUserIcon and gemini */}
-        <p className='cursor-pointer' onClick={handleGeminiClick}>Gemini</p>
+        <p className='cursor-pointer' onClick={handleGeminiClick}>TrailAi</p>
         <CircleUserRound size={40} className='text-softTextColor' />
       </div>
 
@@ -25,27 +25,29 @@ const GeminiBody = () => {
             {/* Hello, Name Section*/}
             < div className='my-12 text-5xl font-medium p-5'>
               <p>
-                <span className='font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400'>Hello, Amit</span>
+                <span className='font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-yellow-400'>Welcome to TrailAi!</span>
               </p>
               <p>How can I help you today?</p>
             </div>
 
             {/* Four boxes section*/}
-            <div className='grid grid-cols-1 sm:grid-cols-4 gap-5 p-5'>
+        
+            <div className='card grid grid-cols-1 sm:grid-cols-4 gap-5 p-5'>
               <div className='h-48 p-4 bg-bgSecondaryColor rounded-xl relative cursor-pointer'>
-                <p>Create a list of power phrases for my resume</p>
+                  {/* onClick={() => setInput("Can you eloborate for me the USTP dresscode base on the handbook?")} */}
+                <p>Can you eloborate for me the USTP dresscode base on the handbook?</p>
                 <Compass size={35} className='p-1 absolute bottom-2 right-2 bg-bgPrimaryColor text-softTextColor rounded-full' />
               </div>
               <div className='h-48 p-4 bg-bgSecondaryColor rounded-xl relative cursor-pointer'>
-                <p>Help me incorporate more plant-based options in my diet</p>
+                <p>What happen if I consecutively absent in 3 days?</p>
                 <Lightbulb size={35} className='p-1 absolute bottom-2 right-2 bg-bgPrimaryColor text-softTextColor rounded-full' />
               </div>
               <div className='h-48 p-4 bg-bgSecondaryColor rounded-xl relative cursor-pointer'>
-                <p>Look up a Linux shell command for specific task</p>
+                <p>How to calculate my GWA?</p>
                 <ChevronsLeftRight size={35} className='p-1 absolute bottom-2 right-2 bg-bgPrimaryColor text-softTextColor rounded-full' />
               </div>
               <div className='h-48 p-4 bg-bgSecondaryColor rounded-xl relative cursor-pointer mb-5'>
-                <p>What is the it takes to walk to several landmark</p>
+                <p>Who is the president of USTP system?</p>
                 <MapPin size={35} className='p-1 absolute bottom-2 right-2 bg-bgPrimaryColor text-softTextColor rounded-full' />
               </div>
             </div>
@@ -95,8 +97,8 @@ const GeminiBody = () => {
 
             </div>
           </form>
-          <p className='text-gray-400 text-sm text-center p-3'>Gemini may display inaccurate info, including about people, so
-            double-check its responses. <u className='cursor-pointer'>Your privacy and Gemini Apps</u></p>
+          <p className='text-gray-400 text-sm text-center p-3'>TrailAi may display inaccurate info, including about people, so
+            double-check its responses. <u className='cursor-pointer'>Your privacy and TrailAi</u></p>
         </div>
       </div>
     </div>
