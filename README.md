@@ -1,6 +1,4 @@
-## <a name="introduction">🤖 Introduction</a>
-
-Welcome to the TrailAi project, a faithful recreation inspired by the popular Gemini platform. Gemini Clone is a comprehensive attempt to replicate the essence and functionality of the original Gemini application, providing users with a familiar and intuitive experience. From its sleek design to its robust features, Gemini Clone aims to offer a seamless platform for exploring and interacting with various content types.
+## <a name="introduction">🤖 TrailAi</a>
 
 ## <a name="tech-stack">Tech Stack</a>
 
