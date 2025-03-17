@@ -1,5 +1,5 @@
 import Sidebar from "@/components/Sidebar";
-import GeminiBody from "@/components/GeminiBody";
+import GeminiBody from "@/components/TrailAi";
 
 export default function Home() {
   return (
