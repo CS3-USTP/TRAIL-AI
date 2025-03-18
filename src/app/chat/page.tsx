@@ -107,61 +107,86 @@ export default function ChatPage() {
 	};
 
 	return (
-		<div className="flex flex-col h-screen max-h-screen bg-gray-50">
+		<div className="flex flex-col h-screen max-h-screen bg-gray-900 text-gray-100">
 			{/* Header */}
-			<header className="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
-				<h1 className="text-2xl font-bold text-blue-600">Neuro AI Chat</h1>
+			<header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+				<div className="flex items-center gap-2">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400">
+						<circle cx="12" cy="12" r="10"></circle>
+						<circle cx="12" cy="12" r="4"></circle>
+						<line x1="21.17" x2="12" y1="8" y2="12"></line>
+					</svg>
+					<h1 className="text-xl font-semibold text-indigo-400">Neuro AI</h1>
+				</div>
 				<div className="flex gap-2">
-					<button onClick={handleClearChat} className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw">
+					<button 
+						onClick={handleClearChat} 
+						className="flex items-center gap-1 px-3 py-2 text-sm text-gray-300 border border-gray-700 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 							<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
 							<path d="M21 3v5h-5"></path>
-							<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-							<path d="M3 21v-5h5"></path>
 						</svg>
-						Clear Chat
+						Reset Chat
 					</button>
 				</div>
 			</header>
 
 			{/* Chat messages area */}
-			<div className="flex-1 overflow-y-auto p-4 space-y-4">
+			<div className="flex-1 overflow-y-auto p-4 space-y-6">
 				{messages.length === 0 ? (
-					<div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-						<div className="mb-4 p-3 bg-blue-100 rounded-full">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+					<div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
+						<div className="mb-4 p-4 bg-gray-800 rounded-full">
+							<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400">
 								<path d="M22 2 11 13"></path>
 								<path d="m22 2-7 20-4-9-9-4 20-7z"></path>
 							</svg>
 						</div>
-						<h2 className="text-xl font-semibold mb-2">Welcome to Neuro AI Chat</h2>
-						<p className="max-w-md">Ask any question to get started. I'm here to help!</p>
+						<h2 className="text-2xl font-semibold mb-2 text-gray-200">How can I help you today?</h2>
+						<p className="max-w-md text-gray-400">Ask me anything or start a conversation.</p>
 					</div>
 				) : (
 					messages.map((message, index) => (
-						<div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-							<div className={`max-w-3xl rounded-lg px-4 py-3 ${message.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white border shadow-sm rounded-bl-none'}`}>
-								<div className="flex justify-between items-start">
-									<div className="prose prose-sm max-w-none">
-										{message.content ? (
-											<div className="whitespace-pre-wrap">{message.content}</div>
-										) : (
-											<div className="flex items-center">
-												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin mr-2">
-													<path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+						<div key={index} className="max-w-3xl mx-auto">
+							<div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+								<div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+									message.role === 'user' 
+									? 'bg-indigo-600 text-white' 
+									: 'bg-gray-800 text-gray-100 border border-gray-700'
+								}`}>
+									<div className="flex justify-between items-start">
+										<div className="prose prose-invert prose-sm max-w-none">
+											{message.content ? (
+												<div className="whitespace-pre-wrap">{message.content}</div>
+											) : (
+												<div className="flex items-center justify-center py-2">
+													<div className="thinking-animation">
+														<div className="brain-container">
+															<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400">
+																<circle cx="12" cy="12" r="10"></circle>
+																<circle cx="12" cy="12" r="4"></circle>
+																<line x1="21.17" x2="12" y1="8" y2="12"></line>
+															</svg>
+															<div className="pulse-rings"></div>
+														</div>
+														<div className="ml-3 thinking-text">Thinking...</div>
+													</div>
+												</div>
+											)}
+										</div>
+										{message.role === 'assistant' && message.content && (
+											<button 
+												onClick={() => handleCopy(message.content)} 
+												className="ml-2 p-1 text-gray-500 hover:text-gray-300 transition-colors" 
+												title="Copy to clipboard"
+											>
+												<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+													<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+													<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
 												</svg>
-												<span>Thinking...</span>
-											</div>
+											</button>
 										)}
 									</div>
-									{message.role === 'assistant' && message.content && (
-										<button onClick={() => handleCopy(message.content)} className="ml-2 p-1 text-gray-400 hover:text-gray-600 rounded" title="Copy to clipboard">
-											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-												<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-												<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-											</svg>
-										</button>
-									)}
 								</div>
 							</div>
 						</div>
@@ -172,7 +197,7 @@ export default function ChatPage() {
 
 			{/* Error message */}
 			{error && (
-				<div className="mx-6 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-center">
+				<div className="mx-6 mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-400 flex items-center">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
 						<circle cx="12" cy="12" r="10"></circle>
 						<line x1="15" x2="9" y1="9" y2="15"></line>
@@ -183,25 +208,133 @@ export default function ChatPage() {
 			)}
 
 			{/* Input area */}
-			<div className="p-4 bg-white border-t">
-				<form onSubmit={handleSubmit} className="flex items-end gap-2 max-w-4xl mx-auto">
-					<div className="relative flex-1">
-						<textarea ref={textareaRef} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask a question..." rows={1} disabled={loading} className="w-full p-3 pr-10 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 max-h-32" />
+			<div className="p-4 bg-gray-800 border-t border-gray-700">
+				<form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
+					<div className="relative">
+						<textarea 
+							ref={textareaRef} 
+							value={query} 
+							onChange={e => setQuery(e.target.value)} 
+							onKeyDown={handleKeyDown} 
+							placeholder="Send a message..." 
+							rows={1} 
+							disabled={loading} 
+							className="w-full p-4 pr-12 bg-gray-700 border border-gray-600 rounded-lg resize-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-100 placeholder-gray-400 max-h-32" 
+						/>
+						<button 
+							type="submit" 
+							disabled={loading || !query.trim()} 
+							className="absolute bottom-3 right-3 p-2 text-indigo-400 hover:text-indigo-300 disabled:text-gray-500 disabled:cursor-not-allowed rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+						>
+							{loading ? (
+								<div className="sending-animation">
+									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+										<path d="M22 2 11 13"></path>
+										<path d="m22 2-7 20-4-9-9-4 20-7z"></path>
+									</svg>
+								</div>
+							) : (
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<path d="M22 2 11 13"></path>
+									<path d="m22 2-7 20-4-9-9-4 20-7z"></path>
+								</svg>
+							)}
+						</button>
 					</div>
-					<button type="submit" disabled={loading || !query.trim()} className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 disabled:cursor-not-allowed">
-						{loading ? (
-							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
-								<path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-							</svg>
-						) : (
-							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<path d="M22 2 11 13"></path>
-								<path d="m22 2-7 20-4-9-9-4 20-7z"></path>
-							</svg>
-						)}
-					</button>
 				</form>
 			</div>
+
+			{/* CSS for loading animation */}
+			<style jsx>{`
+				.thinking-animation {
+					display: flex;
+					align-items: center;
+				}
+				
+				.brain-container {
+					position: relative;
+					width: 30px;
+					height: 30px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				
+				.pulse-rings {
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					border-radius: 50%;
+					border: 2px solid rgba(144, 137, 252, 0.3);
+					animation: pulse 2s infinite ease-out;
+				}
+				
+				.pulse-rings:before, .pulse-rings:after {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					border-radius: 50%;
+					border: 2px solid rgba(144, 137, 252, 0.3);
+					animation: pulse 2s infinite ease-out;
+				}
+				
+				.pulse-rings:before {
+					animation-delay: 0.5s;
+				}
+				
+				.pulse-rings:after {
+					animation-delay: 1s;
+				}
+				
+				.thinking-text {
+					font-size: 0.9rem;
+					color: #9089fc;
+					opacity: 0.9;
+					animation: fadeInOut 2s infinite;
+				}
+				
+				.sending-animation {
+					animation: rotate 2s infinite linear;
+				}
+				
+				@keyframes pulse {
+					0% {
+						transform: scale(0.8);
+						opacity: 0.8;
+					}
+					50% {
+						transform: scale(1.5);
+						opacity: 0;
+					}
+					100% {
+						transform: scale(0.8);
+						opacity: 0;
+					}
+				}
+				
+				@keyframes fadeInOut {
+					0%, 100% {
+						opacity: 0.4;
+					}
+					50% {
+						opacity: 1;
+					}
+				}
+				
+				@keyframes rotate {
+					0% {
+						transform: rotate(0deg);
+					}
+					100% {
+						transform: rotate(360deg);
+					}
+				}
+			`}</style>
 		</div>
 	);
 }
