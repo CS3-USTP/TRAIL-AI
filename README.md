@@ -16,28 +16,16 @@
 
 ## 🛠️ Setup
 
-### 1️⃣ Install **Deno 2.0**
+### 1️⃣ Install **Node JS v23.10.0**
 
 #### 🖥️ Windows
 
-Run the following command in PowerShell:
-
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
-
-#### 🐧 macOS & Linux
-
-Follow the official Deno installation guide: [Deno Docs](https://docs.deno.com/runtime/getting_started/installation/)
-
----
-
-## 📦 Install Dependencies
+## 📦 Install PNPM
 
 Run:
 
 ```sh
-deno install
+npm install -g pnpm
 ```
 
 ---
@@ -47,7 +35,8 @@ deno install
 Start the application with:
 
 ```sh
-deno run dev
+pnpm run dev
+pnpm run vectordb
 ```
 
 ---
