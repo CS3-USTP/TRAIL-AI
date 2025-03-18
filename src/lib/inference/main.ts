@@ -1,6 +1,6 @@
 import ollama from 'ollama';
 import { Message } from 'ollama';
-import { Response } from '@/types/database';
+import { Response } from '@/types/vectordb';
 import { Coherence } from '@/types/coherence';
 
 async function fetchDatabase(query: string): Promise<string> {

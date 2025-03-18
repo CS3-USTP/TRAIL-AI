@@ -1,6 +1,6 @@
-import { Message } from '@/types/ollama';
+import { Message } from '@/types/inference';
 import { NextResponse } from 'next/server';
-import GenerateAssistantResponse from '@/lib/ollama/main';
+import GenerateAssistantResponse from '@/lib/inference/main';
 
 const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',

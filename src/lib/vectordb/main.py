@@ -42,7 +42,7 @@ executor = ThreadPoolExecutor(max_workers=4)
 
 # ---------------------------- Connect to ChromaDB --------------------------- #
 
-client = PersistentClient(path="src/lib/chroma/db")
+client = PersistentClient(path="src/lib/vectordb/storage")
 collection = client.get_collection("ustp_handbook_2023")
 
 
@@ -137,15 +137,11 @@ async def semantic_search(request: QueryRequest) -> Dict[str, Any]:  # ✅ Now a
     )
 
     for chunk in zip(response["documents"][0], response["distances"][0], response["ids"][0]):
-        
         print(chunk, "\n\n=====\n\n")
-        
-        if chunk[1] >= threshold:
-            continue
-
-        document  += chunk[0]      + "\n\n=====\n\n"
-        distance  += str(chunk[1]) + ", "
-        reference += chunk[2]      + ", "
+        if chunk[1] < threshold:
+            document  += chunk[0]      + "\n\n=====\n\n"
+            distance  += str(chunk[1]) + ", "
+            reference += chunk[2]      + ", "
 
     document  = document.strip()
     distance  = distance[:-2]
