@@ -10,14 +10,14 @@ print(f"Using device: {device}")
 
 print("Loading the model...")
 model = SentenceTransformer(
-    "NovaSearch/stella_en_400M_v5",
+    "sentence-transformers/all-mpnet-base-v2",
     trust_remote_code=True,
     device=device   
 )
 
 # Connect to ChromaDB
 print("Connecting to ChromaDB...")
-client = PersistentClient(path="../db")  # Store data persistently
+client = PersistentClient(path="../storage")  # Store data persistently
 collection_name = "ustp_handbook_2023"
 
 # Get the collection
@@ -36,7 +36,7 @@ while True:
     print("Processing query...")
 
     # Encode the query
-    query_embedding = model.encode(query_text, device=device, convert_to_numpy=True, normalize_embeddings=True, prompt_name="s2p_query")
+    query_embedding = model.encode(query_text, device=device, convert_to_numpy=True, normalize_embeddings=True)
 
     # Query ChromaDB
     results = collection.query(query_embeddings=[query_embedding.tolist()], n_results=10)

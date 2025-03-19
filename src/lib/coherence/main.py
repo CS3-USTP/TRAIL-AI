@@ -1,6 +1,5 @@
 import json
 import torch
-import requests
 from sentence_transformers import CrossEncoder
 from joblib import dump, load
 import numpy as np
@@ -61,7 +60,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     semantic_model = CrossEncoder(
-        "cross-encoder/nli-deberta-v3-large",
+        "cross-encoder/nli-deberta-v3-base",
         trust_remote_code=True,
         device=device
     )
@@ -98,6 +97,8 @@ def main():
             
         logistic_model = train_logistic_model(X, Y, 0.2)
         dump(logistic_model, "./out/model.joblib")
+        
+        print("Model trained and saved successfully.")
 
         # premise: what is cs3 what is are they hypthesis: what are they
         example_inputs = [(-3.4040327072143555, -3.5754246711730957, 5.186447620391846)]

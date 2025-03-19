@@ -7,9 +7,9 @@ from chromadb import PersistentClient
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
 
-# Load embedding model
 model = SentenceTransformer(
-    "NovaSearch/stella_en_400M_v5",
+# Load embedding model
+    "sentence-transformers/all-mpnet-base-v2",
     trust_remote_code=True,
     device=device   
 )
@@ -46,7 +46,7 @@ with open("../data/chunks.csv", "r", encoding="utf-8") as file:
 # Process embeddings and store in ChromaDB
 for index, chunk in chunks:
     print(f"Processing chunk {index}...")
-    embedding = model.encode(chunk, prompt_name="s2p_query", convert_to_numpy=True, normalize_embeddings=True)
+    embedding = model.encode(chunk, convert_to_numpy=True, normalize_embeddings=True)
     collection.add(ids=[f"id-{index}"], documents=[chunk], embeddings=[embedding.tolist()])
     print(f"Chunk {index} added to ChromaDB.")
 
