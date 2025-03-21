@@ -15,7 +15,7 @@ model = SentenceTransformer(
 )
 
 # Connect to ChromaDB
-client = PersistentClient(path="core/db/chroma")  # Store data persistently
+client = PersistentClient(path="db/chroma")  # Store data persistently
 collection_name = "ustp_handbook_2023"
 
 # Delete collection if it exists
@@ -32,7 +32,7 @@ print("Collection created.")
 
 # Read CSV file and stor chunks
 chunks = []
-with open("core/lib/embeddings/data/chunks.csv", "r", encoding="utf-8") as file:
+with open("lib/embeddings/data/chunks.csv", "r", encoding="utf-8") as file:
     reader = csv.reader(file)
     
     for index, row in enumerate(reader):

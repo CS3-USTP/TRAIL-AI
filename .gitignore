@@ -6,10 +6,10 @@ venv/
 # chromadb (database) 
 __pycache__/
 chroma.log
-/core/db/chroma
+chroma/
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -22,7 +22,7 @@ chroma.log
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
