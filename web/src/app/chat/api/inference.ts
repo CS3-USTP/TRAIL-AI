@@ -67,7 +67,7 @@ async function retrieveContext(messages: Message[]): Promise<string> {
 }
 
 async function processMessages(messages: Message[]): Promise<Message[]> {
-    let system: Message = { 
+    const system: Message = { 
         role: 'system', 
         content: `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Techology of Southern Philippines) located at Cagayan De Oro City, Philippines. Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook provided by CS3 which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
     `};
@@ -79,7 +79,7 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
 	const context = await retrieveContext(messages);    
     
     // get the last message as the user query
-	let query = messages[messages.length - 1];
+	const query = messages[messages.length - 1];
 
 	if (!context) {
 		query.content = `
