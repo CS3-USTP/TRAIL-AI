@@ -1,0 +1,7 @@
+__pycache__
+chroma.log
+db/
+venv/
+scripts/
+lib/coherence/data
+lib/coherence/out/results.json
