@@ -21,11 +21,21 @@ export default function ChatPage() {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
 
-	// Auto-resize textarea based on content
+	// Auto-resize textarea based on content and only show scrollbar if more than 2 lines
 	useEffect(() => {
 		if (textareaRef.current) {
 			textareaRef.current.style.height = 'auto';
 			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+			
+			// Get line height and calculate if content is more than 2 lines
+			const lineHeight = parseInt(window.getComputedStyle(textareaRef.current).lineHeight);
+			const lines = textareaRef.current.scrollHeight / lineHeight;
+			
+			if (lines <= 2) {
+				textareaRef.current.style.overflowY = 'hidden';
+			} else {
+				textareaRef.current.style.overflowY = 'auto';
+			}
 		}
 	}, [query]);
 
@@ -116,7 +126,7 @@ export default function ChatPage() {
 						<circle cx="12" cy="12" r="4"></circle>
 						<line x1="21.17" x2="12" y1="8" y2="12"></line>
 					</svg>
-					<h1 className="text-xl font-semibold text-indigo-400">Neuro AI</h1>
+					<h1 className="text-md font-semibold text-indigo-400">Trail AI</h1>
 				</div>
 				<div className="flex gap-2">
 					<button 
@@ -124,10 +134,11 @@ export default function ChatPage() {
 						className="flex items-center gap-1 px-3 py-2 text-sm text-gray-300 border border-gray-700 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-							<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-							<path d="M21 3v5h-5"></path>
+							<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+							<line x1="12" y1="8" x2="12" y2="16"></line>
+							<line x1="8" y1="12" x2="16" y2="12"></line>
 						</svg>
-						Reset Chat
+						New Chat
 					</button>
 				</div>
 			</header>
@@ -219,7 +230,7 @@ export default function ChatPage() {
 							placeholder="Send a message..." 
 							rows={1} 
 							disabled={loading} 
-							className="w-full p-4 pr-12 bg-gray-700 border border-gray-600 rounded-lg resize-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-100 placeholder-gray-400 max-h-32" 
+							className="w-full p-3 pr-12 bg-gray-700 border border-gray-600 rounded-lg resize-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-100 placeholder-gray-400 max-h-32" 
 						/>
 						<button 
 							type="submit" 
@@ -227,11 +238,8 @@ export default function ChatPage() {
 							className="absolute bottom-3 right-3 p-2 text-indigo-400 hover:text-indigo-300 disabled:text-gray-500 disabled:cursor-not-allowed rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
 						>
 							{loading ? (
-								<div className="sending-animation">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-										<path d="M22 2 11 13"></path>
-										<path d="m22 2-7 20-4-9-9-4 20-7z"></path>
-									</svg>
+								<div className="spinner-container">
+									<div className="spinner"></div>
 								</div>
 							) : (
 								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -298,8 +306,21 @@ export default function ChatPage() {
 					animation: fadeInOut 2s infinite;
 				}
 				
-				.sending-animation {
-					animation: rotate 2s infinite linear;
+				.spinner-container {
+					width: 20px;
+					height: 20px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				
+				.spinner {
+					width: 16px;
+					height: 16px;
+					border: 2px solid rgba(144, 137, 252, 0.3);
+					border-top: 2px solid #9089fc;
+					border-radius: 50%;
+					animation: spin 0.8s linear infinite;
 				}
 				
 				@keyframes pulse {
@@ -326,7 +347,7 @@ export default function ChatPage() {
 					}
 				}
 				
-				@keyframes rotate {
+				@keyframes spin {
 					0% {
 						transform: rotate(0deg);
 					}
