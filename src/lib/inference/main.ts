@@ -52,8 +52,6 @@ async function retrieveContext(messages: Message[]): Promise<string> {
     const newQuery = messages[messages.length - 1];
     const coherence = await fetchCoherence(oldQuery.content, newQuery.content);
 
-    console.log('\n\nCoherence: ', coherence, '\n\n');
-
     let context = "";
     if (coherence) {
         // if coherent, combine the messages
@@ -71,7 +69,7 @@ async function retrieveContext(messages: Message[]): Promise<string> {
 async function processMessages(messages: Message[]): Promise<Message[]> {
     let system: Message = { 
         role: 'system', 
-        content: `Your name is Neuro, an AI assistant developed by the CS3 (COMPUTER SCIENCE STUDENT SOCIETY) - a student organization at USTP (UNIVERSITY OF SCIENCE AND TECHNOLOGY OF SOUTHERN PHILIPPINES). Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
+        content: `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Techology of Southern Philippines) located at Cagayan De Oro City, Philippines. Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook provided by CS3 which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
     `};
 
     // get the history of the conversation without the user query
@@ -94,7 +92,7 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
 	} else {
 		query.content += `
        
-        Provide and answer by only using the university handbook context with an informative and detailed response. Always add a lot of emojis. Do not give external links that are not in the handbook. If the university handbook context does not have info about the query, refuse to answer even if its general knowledge, instead remind me about your purpose and ask me for questions related to the university handbook.
+        Provide and answer by only using the university handbook context with an informative and detailed response. Always add a lot of emojis. Do not give external links that are not in the handbook. If the university handbook context does not have info about the query, refuse to answer even if its general knowledge, instead remind me about your purpose and ask me for context related questions in the university handbook.
 
         Query: "${query.content.toLowerCase()}"       
 
