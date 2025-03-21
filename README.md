@@ -5,10 +5,10 @@
 -  ⚙️ **Ollama** - For running LLMs
 -  📊 **ChromaDB** - For data ingestion
 -  🔮 **gemma2:2b** - For generation
--  🧠 **stella_en_400M_v5** - For embeddings
--  🔰 **ms-marco-MiniLM-L6-v2** - For reranking
--  💬 **nli-deberta-v3-large** - For coherence
--  🐍 **Python 3.12.9** - For testing
+-  🧠 **all-mpnet-base-v2** - For embeddings
+-  🔰 **mxbai-rerank-large-v1** - For reranking
+-  💬 **nli-deberta-v3-base** - For coherence
+-  🐍 **Python 3.12** - For ml apis
 -  🦕 **Node.js 23.10.0** - For JS runtime
 -  🌐 **Next.js** - For web application
 
