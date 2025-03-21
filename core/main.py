@@ -1,4 +1,4 @@
-from src.lib.coherence.main import predict
+from core.lib.coherence.utils import predict
 import plotext as plt
 import numpy as np
 import torch
@@ -39,12 +39,12 @@ reranker_model = CrossEncoder(
     device=device
 )
 
-coherence_model = load("src/lib/coherence/out/model.joblib")
+coherence_model = load("core/lib/coherence/out/model.joblib")
 
 
 # ---------------------------- Connect to ChromaDB --------------------------- #
 
-client = PersistentClient(path="src/lib/vectordb/storage")
+client = PersistentClient(path="core/db/chroma")
 collection = client.get_collection("ustp_handbook_2023")
 
 

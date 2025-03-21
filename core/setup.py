@@ -15,7 +15,7 @@ model = SentenceTransformer(
 )
 
 # Connect to ChromaDB
-client = PersistentClient(path="../storage")  # Store data persistently
+client = PersistentClient(path="core/db/chroma")  # Store data persistently
 collection_name = "ustp_handbook_2023"
 
 # Delete collection if it exists
@@ -25,14 +25,14 @@ try:
 except:
     print("No existing collection to delete.")
 
-# Create a new collection
+# Create a new ecollection
 print("Creating new collection...")
 collection = client.create_collection(collection_name)
 print("Collection created.")
 
-# Read CSV file and store chunks
+# Read CSV file and stor chunks
 chunks = []
-with open("../data/chunks.csv", "r", encoding="utf-8") as file:
+with open("core/lib/embeddings/data/chunks.csv", "r", encoding="utf-8") as file:
     reader = csv.reader(file)
     
     for index, row in enumerate(reader):

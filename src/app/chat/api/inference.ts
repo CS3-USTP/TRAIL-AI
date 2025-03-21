@@ -1,7 +1,7 @@
 import ollama from 'ollama';
 import { Message } from 'ollama';
-import { Response } from '@/types/vectordb';
-import { Coherence } from '@/types/coherence';
+import { Response } from '@/types/core';
+import { Coherence } from '@/types/core';
 
 async function fetchDatabase(query: string): Promise<string> {
     const chroma_api = 'http://localhost:8000/semantic-search';

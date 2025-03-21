@@ -17,7 +17,7 @@ model = SentenceTransformer(
 
 # Connect to ChromaDB
 print("Connecting to ChromaDB...")
-client = PersistentClient(path="../storage")  # Store data persistently
+client = PersistentClient(path="core/db/chroma")  # Store data persistently
 collection_name = "ustp_handbook_2023"
 
 # Get the collection

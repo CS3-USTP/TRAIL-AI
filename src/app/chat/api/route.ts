@@ -1,6 +1,6 @@
-import { Message } from '@/types/inference';
+import { Message } from '@/types/core';
 import { NextResponse } from 'next/server';
-import GenerateAssistantResponse from '@/lib/inference/main';
+import GenerateAssistantResponse from '@/app/chat/api/inference';
 
 const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',
