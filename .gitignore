@@ -6,7 +6,7 @@ venv/
 # chromadb (database) 
 __pycache__/
 chroma.log
-vectordb/
+vectordb/storage/
 
 # dependencies
 /node_modules
