@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer, CrossEncoder
 from chromadb import PersistentClient
 from pydantic import BaseModel
 from typing import Dict, Any, List, Tuple
-# from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 # ---------------------------- Initialize FastAPI ---------------------------- #
 
@@ -40,10 +40,6 @@ reranker_model = CrossEncoder(
 )
 
 coherence_model = load("src/lib/coherence/out/model.joblib")
-    
-# # --------------- ThreadPoolExecutor to offload blocking tasks --------------- #
-
-# executor = ThreadPoolExecutor(max_workers=4)
 
 
 # ---------------------------- Connect to ChromaDB --------------------------- #
@@ -101,27 +97,34 @@ def plot_1d_array_with_threshold(data: list[float], threshold: float) -> None:
     plt.show()
 
 
+# Helper function to run CPU-bound tasks in a thread pool
+async def run_in_threadpool(func, *args, **kwargs):
+    """Run a CPU-bound function in a threadpool to avoid blocking the event loop."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
+
 # --------------------------- Define the API routes -------------------------- #
 
 @app.get("/")
-def read_root() -> Dict[str, str]:
+async def read_root() -> Dict[str, str]:
     """Welcome message."""
     return {"message": "Welcome to the USTP Handbook Semantic Search API!"}
 
 
 @app.post("/coherence-check")
-def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
+async def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
     """Check the coherence of the query with the provided context."""
     
     premise = request.premise
     hypothesis = request.hypothesis
 
-    # Run model prediction directly
-    results = relation_model.predict([(premise, hypothesis)])
+    # Run model prediction in a thread pool
+    results = await run_in_threadpool(relation_model.predict, [(premise, hypothesis)])
     # model can bulk queries, we take the first query result
     values = results[0].tolist()
     
-    coherence = predict(coherence_model, [values])
+    coherence = await run_in_threadpool(predict, coherence_model, [values])
 
     print(f"Coherence: {coherence}")
     
@@ -137,10 +140,11 @@ def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
 
 
 @app.get("/query-metadata/{doc_id}")
-def query_metadata(doc_id: str) -> Dict[str, Any]:
+async def query_metadata(doc_id: str) -> Dict[str, Any]:
     """Retrieve a document by its metadata ID."""
     
-    results = collection.get([doc_id])
+    # ChromaDB operations in a thread pool
+    results = await run_in_threadpool(collection.get, [doc_id])
     
     if not results.get("documents"):
         raise HTTPException(status_code=404, detail="Document not found")
@@ -148,33 +152,34 @@ def query_metadata(doc_id: str) -> Dict[str, Any]:
     return results
 
 
-
 @app.post("/semantic-search")
-def semantic_search(request: QueryRequest) -> JSONResponse:
+async def semantic_search(request: QueryRequest) -> JSONResponse:
     """Perform semantic search and return only relevant results."""
 
     query = request.query
-    response = query_paragraph(query)
-    response = rerank_response(query, response)
-    response = format_response(response)
+    response = await query_paragraph(query)
+    response = await rerank_response(query, response)
+    response = await format_response(response)
 
     return response
 
 
-def query_paragraph(query: str) -> Dict[str, Any]:
+async def query_paragraph(query: str) -> Dict[str, Any]:
     """Retrieve the document using the query embedding."""
     
     n_results = 20
 
-    # Generate embeddings directly
-    query_embedding = embedding_model.encode(
+    # Generate embeddings in a thread pool
+    query_embedding = await run_in_threadpool(
+        embedding_model.encode,
         query, 
         convert_to_numpy=True, 
         normalize_embeddings=True
     )
 
-    # Query ChromaDB directly
-    response = collection.query(
+    # Query ChromaDB in a thread pool
+    response = await run_in_threadpool(
+        collection.query,
         query_embeddings=[query_embedding.tolist()], 
         n_results=n_results
     )
@@ -182,7 +187,7 @@ def query_paragraph(query: str) -> Dict[str, Any]:
     return response
 
 
-def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
+async def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
     """Rerank the search results using a reranker model."""
     
     documents = response.get("documents", [[]])[0]
@@ -191,10 +196,22 @@ def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
 
     ranked_results = []
 
-    # Compute scores
-    for doc, ref, dist in zip(documents, references, distances):
-        score = float(reranker_model.predict([(query, doc)])[0])  # Assuming the model returns a list
-        ranked_results.append((doc, ref, dist, score))
+    # Compute scores - process in batches to avoid too many individual thread pool calls
+    batch_size = 5
+    for i in range(0, len(documents), batch_size):
+        batch_docs = documents[i:i+batch_size]
+        batch_refs = references[i:i+batch_size]
+        batch_dists = distances[i:i+batch_size]
+        
+        # Prepare batch inputs
+        batch_inputs = [(query, doc) for doc in batch_docs]
+        
+        # Run prediction in thread pool
+        batch_scores = await run_in_threadpool(reranker_model.predict, batch_inputs)
+        
+        # Add results to ranked_results
+        for doc, ref, dist, score in zip(batch_docs, batch_refs, batch_dists, batch_scores):
+            ranked_results.append((doc, ref, dist, float(score)))
 
     # Sort results based on the score (higher is better)
     ranked_results.sort(key=lambda x: x[3], reverse=True)
@@ -213,7 +230,9 @@ def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
         print(f"Score: {score}")
         print(f"Document:\n{doc}")
         print("\n====\n")
-    plot_1d_array_with_threshold(sorted_scores, threshold)
+    
+    # Run plot in thread pool to avoid blocking
+    await run_in_threadpool(plot_1d_array_with_threshold, sorted_scores, threshold)
     
     # filter out results below the threshold
     sorted_documents  = [doc   for doc,  score  in zip(sorted_documents,  sorted_scores) if score > threshold]
@@ -229,7 +248,7 @@ def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def format_response(response: Dict[str, Any]) -> JSONResponse:
+async def format_response(response: Dict[str, Any]) -> JSONResponse:
     """Format the response to be returned to the client."""
     
     documents  = response.get("documents") # list of documents
