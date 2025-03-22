@@ -37,9 +37,9 @@ async function fetchCoherence(premise: string, hypothesis: string): Promise<bool
 async function processMessages(messages: Message[]): Promise<Message[]> {
     // Create system message defining the AI assistant's role and behavior
     const systemMessage: Message = { 
-        role: 'user', // gemma2 models lacks a system prompt
+        role: 'system', // gemma2 models lacks a system prompt
         content: `
-        You are Neuro, an AI assistant created by the CS3 (Computer Science Student Society) at the University of Science and Technology of Southern Philippines (USTP) in Cagayan de Oro City. Your purpose is to assist students, faculty, and staff by providing accurate and concise responses exclusively from the university handbook, focusing strictly on USTP's policies, guidelines, and regulations.       
+        You are Neuro, an AI assistant created by the CS3 (Computer Science Student Society) at the University of Science and Technology of Southern Philippines (USTP) in Cagayan de Oro City.     
         `
     };
 
@@ -80,7 +80,7 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
 
     // Enhance the query with context information
     currentQuery.content = `
-    Give clear and detailed answers. If a question is unclear, off-topic, and not in the university handbook context, ask for clarification or say the information is not available, instead remind me of your purpose. YOU ARE NOT ALLOWED TO ANSWER GENERAL QUERIES THAT IS BEYOND THE SCOPE OF THE CONTEXT.
+    Your purpose is to assist students, faculty, and staff by providing accurate and concise responses exclusively from the handbook context provided by the university, focusing strictly on policies, guidelines, and regulations of USTP. If the query below is unclear, off-topic, or not handbook related, say the information is not available and ask for clarification then remind me of your purpose instead. YOU ARE NOT ALLOWED TO ANSWER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
     
     Query: "${currentQuery.content.toLowerCase()}"
     
