@@ -19,7 +19,7 @@ services:
     networks:
       - network
     depends_on:
-      - core
+    # - core
       - ollama
 
 
