@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 type MessageType = {
-	role: 'user' | 'assistant';
+	role: 'user' | 'model';
 	content: string;
 };
 
@@ -12,6 +12,7 @@ export default function ChatPage() {
 	const [messages, setMessages] = useState<MessageType[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
+	const MAX_CHARS = 100;
 
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,6 +55,14 @@ export default function ChatPage() {
 		}
 	};
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const value = e.target.value;
+		// Limit input to MAX_CHARS characters
+		if (value.length <= MAX_CHARS) {
+			setQuery(value);
+		}
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!query.trim()) return;
@@ -67,8 +76,8 @@ export default function ChatPage() {
 		setLoading(true);
 
 		try {
-			// Add empty assistant message to show typing indicator
-			setMessages([...updatedMessages, { role: 'assistant', content: '' }]);
+			// Add empty model message to show typing indicator
+			setMessages([...updatedMessages, { role: 'model', content: '' }]);
 
 			// Get the last 3 messages to send to API
 			const lastMessages = updatedMessages.slice(-3);
@@ -99,14 +108,14 @@ export default function ChatPage() {
 				setMessages(prev => {
 					const newMessages = [...prev];
 					newMessages[newMessages.length - 1] = {
-						role: 'assistant',
+						role: 'model',
 						content: finalText,
 					};
 					return newMessages;
 				});
 			}
 		} catch (err) {
-			setMessages(prev => prev.slice(0, -1)); // Remove the empty assistant message
+			setMessages(prev => prev.slice(0, -1)); // Remove the empty model message
 			setError(err instanceof Error ? err.message : 'Failed to fetch response');
 		} finally {
 			setLoading(false);
@@ -114,6 +123,14 @@ export default function ChatPage() {
 				textareaRef.current.focus();
 			}
 		}
+	};
+
+	// Calculate character count color based on how close to limit
+	const getCharCountColor = () => {
+		const percentage = query.length / MAX_CHARS;
+		if (percentage < 0.7) return 'text-gray-400';
+		if (percentage < 0.9) return 'text-yellow-400';
+		return 'text-red-400';
 	};
 
 	return (
@@ -185,7 +202,7 @@ export default function ChatPage() {
 												</div>
 											)}
 										</div>
-										{message.role === 'assistant' && message.content && (
+										{message.role === 'model' && message.content && (
 											<button 
 												onClick={() => handleCopy(message.content)} 
 												className="ml-2 p-1 text-gray-500 hover:text-gray-300 transition-colors" 
@@ -225,13 +242,18 @@ export default function ChatPage() {
 						<textarea 
 							ref={textareaRef} 
 							value={query} 
-							onChange={e => setQuery(e.target.value)} 
+							onChange={handleInputChange} 
 							onKeyDown={handleKeyDown} 
 							placeholder="Send a message..." 
 							rows={1} 
 							disabled={loading} 
 							className="w-full p-3 pr-12 bg-gray-700 border border-gray-600 rounded-lg resize-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-gray-100 placeholder-gray-400 max-h-32" 
+							maxLength={MAX_CHARS}
 						/>
+						{/* Character counter */}
+						<div className={`absolute text-xs bottom-5.5 right-14 ${getCharCountColor()}`}>
+							{query.length}/{MAX_CHARS}
+						</div>
 						<button 
 							type="submit" 
 							disabled={loading || !query.trim()} 

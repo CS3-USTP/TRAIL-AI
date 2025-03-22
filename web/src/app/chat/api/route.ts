@@ -89,7 +89,7 @@ function validateChatHistory(messages: Message[]): boolean {
         const hasExactlyTwoKeys   = Object.keys(message).length === 2;
         const hasRoleKey          = 'role'    in message;
         const hasContentKey       = 'content' in message;
-        const hasValidRole        = message.role === 'user' || message.role === 'assistant';
+        const hasValidRole        = message.role === 'user' || message.role === 'model';
         const hasValidContent     = typeof message.content === 'string';
 
         // check if the role sequence is correct
@@ -97,7 +97,7 @@ function validateChatHistory(messages: Message[]): boolean {
         const isAssistantTurn     = index % 2 === 1;
         const followsRoleSequence = (
                (isUserTurn      && message.role === 'user') 
-            || (isAssistantTurn && message.role === 'assistant')
+            || (isAssistantTurn && message.role === 'model')
         );
 
         const isContentLengthValid = (

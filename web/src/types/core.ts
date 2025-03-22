@@ -7,7 +7,7 @@ export type Response = {
 };
 
 export type Message = {
-	role: 'user' | 'assistant';
+	role: 'user' | 'model';
 	content: string;
 };
 
