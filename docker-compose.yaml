@@ -1,20 +1,31 @@
-
-
 services:
 
-  core:
-    build: ./core
-    container_name: core
-    ports:
-      - "8000:8000"
+  ollama:
+    build: ./gen
+    container_name: ollama
+    networks:
+      - network
     volumes:
-      - ./models:/app/models
-    
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+
+
   web:
     build: ./web
     container_name: web
     ports:
       - "80:3000"
+    networks:
+      - network
     depends_on:
-          - core
-      
+      - core
+      - ollama
+
+
+volumes:
+  ollama:
+
+
+networks:
+  network: 

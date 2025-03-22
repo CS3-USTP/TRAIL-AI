@@ -1,0 +1,17 @@
+services:
+  core:
+    build: .
+    container_name: core
+    networks:
+      - network
+    ports:
+      - "80:8000"
+    volumes:
+      - models:/app/models
+    
+
+volumes:
+  models:
+
+networks:
+  network:

@@ -1,10 +1,12 @@
-import ollama from 'ollama';
+import { Ollama } from 'ollama';
 import { Message } from 'ollama';
 import { Response } from '@/types/core';
 import { Coherence } from '@/types/core';
 
+const ollama = new Ollama({ host: 'http://ollama:11434' });
+
 async function fetchDatabase(query: string): Promise<string> {
-    const chroma_api = 'http://localhost:8000/semantic-search';
+    const chroma_api = 'http://51.79.161.130/semantic-search';
 
     const response = await fetch(chroma_api, {
         method: 'POST',
@@ -19,7 +21,7 @@ async function fetchDatabase(query: string): Promise<string> {
 
 
 async function fetchCoherence(premise: string, hypothesis: string): Promise<boolean> {
-    const coherence_api = 'http://localhost:8000/coherence-check';
+    const coherence_api = 'http://51.79.161.130/coherence-check';
 
     const response = await fetch(coherence_api, {
         method: 'POST',
@@ -29,7 +31,6 @@ async function fetchCoherence(premise: string, hypothesis: string): Promise<bool
 
     const result: Coherence = await response.json();
     return result.coherence;
-
 }
 
 
@@ -94,7 +95,8 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
 
 
 export default async function GenerateAssistantResponse(messages: Message[]): Promise<ReadableStream> {
-	// generate the response from the ollama API
+    
+    // generate the response from the ollama API
 	const stream = await ollama.chat({
 		stream: true,
 		messages: await processMessages(messages),
@@ -139,8 +141,6 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
 		// never again it does random sht
 		// model: 'phi3.5',
 	});
-
-    console.log(stream);
 
 	// create a readable stream object for the frontend
 	const readableStream = new ReadableStream({
