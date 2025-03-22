@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from chromadb import PersistentClient
 from pydantic import BaseModel
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Optional
 import asyncio
 
 # ---------------------------- Initialize FastAPI ---------------------------- #
@@ -22,24 +22,22 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # ------------------------------ Load the models ----------------------------- #
 
 embedding_model = SentenceTransformer(
-    "sentence-transformers/all-mpnet-base-v2",
-    trust_remote_code=True,
+    "models/all-mpnet-base-v2",
     device=device   
 )
 
 relation_model = CrossEncoder(
-    "cross-encoder/nli-deberta-v3-base",
-    trust_remote_code=True,
+    "models/nli-deberta-v3-base",
     device=device
 )
 
 reranker_model = CrossEncoder(
-    'mixedbread-ai/mxbai-rerank-large-v1',
+    'models/mxbai-rerank-large-v1',
     trust_remote_code=True,
     device=device
 )
 
-coherence_model = load("lib/coherence/out/model.joblib")
+coherence_model = load("models/coherence.joblib")
 
 
 # ---------------------------- Connect to ChromaDB --------------------------- #
@@ -66,7 +64,7 @@ class SearchResult(BaseModel):
     score: float
 
 
-def plot_1d_array_with_threshold(data: list[float], threshold: float) -> None:
+def plot_1d_array_with_threshold(data: list[float], threshold: float, mean: float) -> None:
     """
     Plots a smooth 1D array (or list) in the terminal using plotext, with an average line and manual legend.
 
@@ -87,7 +85,11 @@ def plot_1d_array_with_threshold(data: list[float], threshold: float) -> None:
     plt.scatter(x, data, marker="◆", color="blue")
 
     # Average line
-    plt.plot(x, [threshold] * len(data), color="red", marker="┉	")
+    plt.plot(x, [mean] * len(data), color="orange", marker="┉")
+
+    # Threshold line
+    plt.plot(x, [threshold] * len(data), color="red", marker="┉")
+
 
     # Customize the plot
     plt.title("1D Array Plot with Average Line")
@@ -155,120 +157,216 @@ async def query_metadata(doc_id: str) -> Dict[str, Any]:
 @app.post("/semantic-search")
 async def semantic_search(request: QueryRequest) -> JSONResponse:
     """Perform semantic search and return only relevant results."""
-
-    query = request.query
-    response = await query_paragraph(query)
-    response = await rerank_response(query, response)
-    response = await format_response(response)
-
-    return response
-
-
-async def query_paragraph(query: str) -> Dict[str, Any]:
-    """Retrieve the document using the query embedding."""
-    
-    n_results = 20
-
-    # Generate embeddings in a thread pool
-    query_embedding = await run_in_threadpool(
-        embedding_model.encode,
-        query, 
-        convert_to_numpy=True, 
-        normalize_embeddings=True
-    )
-
-    # Query ChromaDB in a thread pool
-    response = await run_in_threadpool(
-        collection.query,
-        query_embeddings=[query_embedding.tolist()], 
-        n_results=n_results
-    )
-    
-    return response
-
-
-async def rerank_response(query: str, response: Dict[str, Any]) -> Dict[str, Any]:
-    """Rerank the search results using a reranker model."""
-    
-    documents = response.get("documents", [[]])[0]
-    references = response.get("ids", [[]])[0]
-    distances = response.get("distances", [[]])[0]
-
-    ranked_results = []
-
-    # Compute scores - process in batches to avoid too many individual thread pool calls
-    batch_size = 5
-    for i in range(0, len(documents), batch_size):
-        batch_docs = documents[i:i+batch_size]
-        batch_refs = references[i:i+batch_size]
-        batch_dists = distances[i:i+batch_size]
-        
-        # Prepare batch inputs
-        batch_inputs = [(query, doc) for doc in batch_docs]
-        
-        # Run prediction in thread pool
-        batch_scores = await run_in_threadpool(reranker_model.predict, batch_inputs)
-        
-        # Add results to ranked_results
-        for doc, ref, dist, score in zip(batch_docs, batch_refs, batch_dists, batch_scores):
-            ranked_results.append((doc, ref, dist, float(score)))
-
-    # Sort results based on the score (higher is better)
-    ranked_results.sort(key=lambda x: x[3], reverse=True)
-
-    # Extract sorted values
-    sorted_documents, sorted_references, sorted_distances, sorted_scores = zip(*ranked_results)
-
-    # Set the average score as the threshold
-    threshold = np.mean(sorted_scores)
-
-    # Debugging print (optional)
-    for i, (doc, ref, dist, score) in enumerate(ranked_results):
-        print("\n====\n")
-        print(f"Rank: {i}")
-        print(f"Distance: {dist}")
-        print(f"Score: {score}")
-        print(f"Document:\n{doc}")
-        print("\n====\n")
-    
-    # Run plot in thread pool to avoid blocking
-    await run_in_threadpool(plot_1d_array_with_threshold, sorted_scores, threshold)
-    
-    # filter out results below the threshold
-    sorted_documents  = [doc   for doc,  score  in zip(sorted_documents,  sorted_scores) if score > threshold]
-    sorted_references = [ref   for ref,  score  in zip(sorted_references, sorted_scores) if score > threshold]
-    sorted_distances  = [dist  for dist, score  in zip(sorted_distances,  sorted_scores) if score > threshold]
-    sorted_scores     = [score for score        in                        sorted_scores  if score > threshold]
-
-    return {
-        "documents": sorted_documents,
-        "ids":       sorted_references,
-        "distances": sorted_distances,
-        "scores":    sorted_scores
-    }
-
-
-async def format_response(response: Dict[str, Any]) -> JSONResponse:
-    """Format the response to be returned to the client."""
-    
-    documents  = response.get("documents") # list of documents
-    distances  = response.get("distances") # list of distances
-    references = response.get("ids")       # list of references
-    scores     = response.get("scores")    # list of scores
-    
-    if not documents:
+    try:
+        query = request.query
+        search_results = await SemanticSearchPipeline(query).execute()
         return JSONResponse(
-            content={"success": False, "message": "No relevant results found."},
+            content=search_results,
             status_code=200
         )
+    except Exception as e:
+        return JSONResponse(
+            content={"success": False, "message": f"Error: {str(e)}"},
+            status_code=500
+        )
+
+
+class SemanticSearchPipeline:
+    """Pipeline for semantic search with embedding, reranking, and formatting stages."""
     
-    return JSONResponse(
-        content={
+    # Configuration constants
+    INITIAL_RESULTS_COUNT = 10
+    EMBEDDING_THRESHOLD = 1.5
+    RERANKER_THRESHOLD = 0.005
+    BATCH_SIZE = 5
+    MAX_RESULTS_WITHOUT_MEAN_FILTER = 5
+    
+    def __init__(self, query: str):
+        self.query = query
+        self.results = {}
+    
+    async def execute(self) -> Dict[str, Any]:
+        """Execute the complete search pipeline."""
+        await self.retrieve_documents()
+        
+        if not self.results.get("documents"):
+            return {"success": False, "message": "No relevant results found."}
+            
+        await self.rerank_documents()
+        return self.format_results()
+    
+    async def retrieve_documents(self) -> None:
+        """Retrieve relevant documents based on embedding similarity."""
+        # Generate query embedding
+        query_embedding = await run_in_threadpool(
+            embedding_model.encode,
+            self.query,
+            convert_to_numpy=True,
+            normalize_embeddings=True
+        )
+        
+        # Query ChromaDB
+        response = await run_in_threadpool(
+            collection.query,
+            query_embeddings=[query_embedding.tolist()],
+            n_results=self.INITIAL_RESULTS_COUNT
+        )
+        
+        # Extract results
+        documents = response.get("documents", [[]])[0]
+        references = response.get("ids", [[]])[0]
+        distances = response.get("distances", [[]])[0]
+        
+        # Filter by threshold
+        filtered_results = self._filter_by_threshold(
+            documents, references, distances, 
+            threshold=self.EMBEDDING_THRESHOLD,
+            lower_is_better=True
+        )
+        
+        self.results = filtered_results
+    
+    async def rerank_documents(self) -> None:
+        """Rerank retrieved documents using the reranker model."""
+        documents = self.results.get("documents", [])
+        references = self.results.get("references", [])
+        distances = self.results.get("distances", [])
+        
+        if not documents:
+            return
+            
+        ranked_results = []
+        
+        # Process in batches
+        for i in range(0, len(documents), self.BATCH_SIZE):
+            batch_docs = documents[i:i+self.BATCH_SIZE]
+            batch_refs = references[i:i+self.BATCH_SIZE]
+            batch_dists = distances[i:i+self.BATCH_SIZE]
+            
+            # Prepare batch inputs for reranker
+            batch_inputs = [(self.query, doc) for doc in batch_docs]
+            
+            # Get reranker scores
+            batch_scores = await run_in_threadpool(reranker_model.predict, batch_inputs)
+            
+            # Collect results
+            for doc, ref, dist, score in zip(batch_docs, batch_refs, batch_dists, batch_scores):
+                ranked_results.append((doc, ref, dist, float(score)))
+        
+        # Sort by reranker score (higher is better)
+        ranked_results.sort(key=lambda x: x[3], reverse=True)
+        
+        for rank, (doc, ref, dist, score) in enumerate(ranked_results, 1):
+            print("\n====================\n")
+            print(f"Rank: {rank}") 
+            print(f"Reference: {ref}")
+            print(f"Distance: {dist}")
+            print(f"Score: {score}")
+            print(f"Document: {doc}")
+            print("\n====================\n")
+        
+        
+        # Unpack sorted results
+        if ranked_results:
+            sorted_docs, sorted_refs, sorted_dists, sorted_scores = zip(*ranked_results)
+            
+            # Optional: visualize scores
+            mean_score = sum(sorted_scores) / len(sorted_scores)
+            await run_in_threadpool(
+                plot_1d_array_with_threshold, 
+                sorted_scores, self.RERANKER_THRESHOLD, mean_score
+            )
+            
+            filtered_results = {
+                "documents": list(sorted_docs),
+                "references": list(sorted_refs),
+                "distances": list(sorted_dists),
+                "scores": list(sorted_scores)
+            }
+            
+            # Determine the appropriate threshold to use
+            # If more than MAX_RESULTS_WITHOUT_MEAN_FILTER results, use mean as threshold
+            if len(sorted_scores) > self.MAX_RESULTS_WITHOUT_MEAN_FILTER:
+                threshold = max(mean_score, self.RERANKER_THRESHOLD)
+            else:
+                threshold = self.RERANKER_THRESHOLD
+                
+            filtered_results = self._filter_by_threshold(
+                filtered_results["documents"],
+                filtered_results["references"],
+                filtered_results["distances"],
+                threshold=threshold,
+                scores=filtered_results["scores"],
+                lower_is_better=False
+            )
+            
+            self.results = filtered_results
+    
+    def format_results(self) -> Dict[str, Any]:
+        """Format the search results for API response."""
+        documents = self.results.get("documents", [])
+        references = self.results.get("references", [])
+        distances = self.results.get("distances", [])
+        scores = self.results.get("scores", [])
+        
+        if not documents:
+            return {"success": False, "message": "No relevant results found."}
+        
+        return {
             "success": True,
             "document": "\n\n".join(map(str, documents)),
             "reference": ", ".join(map(str, references)),
             "distance": ", ".join(map(str, distances)),
-            "score": ", ".join(map(str, scores))    
-        },
-        status_code=200
-    )
+            "score": ", ".join(map(str, scores))
+        }
+    
+    @staticmethod
+    def _filter_by_threshold(
+        documents: List[str],
+        references: List[str],
+        distances: List[float],
+        threshold: float,
+        scores: Optional[List[float]] = None,
+        lower_is_better: bool = True
+    ) -> Dict[str, List]:
+        """Filter results based on a threshold value.
+        
+        Args:
+            documents: List of document texts
+            references: List of document IDs
+            distances: List of distance scores
+            threshold: Cutoff threshold
+            scores: Optional secondary scores (e.g., from reranker)
+            lower_is_better: If True, keep values below threshold (for distances)
+                            If False, keep values above threshold (for reranker scores)
+        
+        Returns:
+            Filtered results as a dictionary
+        """
+        filtered_docs = []
+        filtered_refs = []
+        filtered_dists = []
+        filtered_scores = []
+        
+        # Determine which values to use for filtering
+        filter_values = scores if scores is not None else distances
+        
+        # Apply appropriate comparison based on whether lower or higher is better
+        for i, value in enumerate(filter_values):
+            if (lower_is_better and value < threshold) or (not lower_is_better and value > threshold):
+                filtered_docs.append(documents[i])
+                filtered_refs.append(references[i])
+                filtered_dists.append(distances[i])
+                if scores:
+                    filtered_scores.append(scores[i])
+        
+        result = {
+            "documents": filtered_docs,
+            "references": filtered_refs,
+            "distances": filtered_dists,
+        }
+        
+        if scores:
+            result["scores"] = filtered_scores
+            
+        return result
