@@ -9,6 +9,9 @@ services:
       - ollama:/root/.ollama
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_KEEP_ALIVE=-1
 
 
   web:
