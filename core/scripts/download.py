@@ -15,5 +15,5 @@ from sentence_transformers import CrossEncoder
 relation_model = CrossEncoder("cross-encoder/nli-deberta-v3-base", device=device)
 relation_model.save("models/nli-deberta-v3-base")
 
-reranker_model = CrossEncoder("mixedbread-ai/mxbai-rerank-large-v1", device=device)
-reranker_model.save("models/mxbai-rerank-large-v1")
+reranker_model = CrossEncoder("mixedbread-ai/mxbai-rerank-xsmall-v1", device=device)
+reranker_model.save("models/mxbai-rerank-xsmall-v1")
