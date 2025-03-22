@@ -32,78 +32,66 @@ async function fetchCoherence(premise: string, hypothesis: string): Promise<bool
 
 }
 
-async function retrieveContext(messages: Message[]): Promise<string> {
-    
-    // check if there is only one message
-    if (messages.length === 1) {
-        // fetch the database with the message content
-        const { role, content } = messages[0];
-        const context = `${role}: ${content}`;
-        const response = await fetchDatabase(context);
-        return response;
-    }
-
-    // expect only 3 messages
-    else if (messages.length !== 3)
-        throw new Error('Invalid number of messages');
-
-    // check if previous query is coherent with the new query
-    const oldQuery = messages[messages.length - 3];
-    const newQuery = messages[messages.length - 1];
-    const coherence = await fetchCoherence(oldQuery.content, newQuery.content);
-
-    let context = "";
-    if (coherence) {
-        // if coherent, combine the messages
-        context = messages.map(message => `${message.role}: ${message.content}`).join('\n\n');
-    }
-    else {
-        // get the last message as the user query instead
-        const message = messages[messages.length - 1];
-        context = `${message.role}: ${message.content}`;
-    }
-    const response = await fetchDatabase(context);
-    return response;
-}
 
 async function processMessages(messages: Message[]): Promise<Message[]> {
-    const system: Message = { 
-        role: 'system', 
-        content: `Your name is Neuro, an AI assistant developed by the CS3 (Computer Science Student Society) - a student organization at USTP (University of Science and Techology of Southern Philippines) located at Cagayan De Oro City, Philippines. Your role is to assist users like the students, faculty, and staff by providing accurate and concise responses from the univesity handbook provided by CS3 which focuses on the policies, guidelines, and regulations of the university. YOU ARE NOT ALLOWED TO ANSWER OBVIOUS COMMON OR GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
-    `};
+    // Create system message defining the AI assistant's role and behavior
+    const systemMessage: Message = { 
+        role: 'user', // gemma2 models lacks a system prompt
+        content: `
+        # Instructions
+        "You are Neuro, an AI assistant created by the CS3 (Computer Science Student Society) at the University of Science and Technology of Southern Philippines (USTP) in Cagayan de Oro City. Your purpose is to assist students, faculty, and staff by providing accurate and concise responses exclusively from the university handbook provided by CS3, focusing strictly on USTP's policies, guidelines, and regulations.       
+        You are strictly limited to information from the handbook. You will not answer general knowledge questions, scientific inquiries, personal opinions, or provide external links outside of the handbook's content. If a question is unrelated to USTP policies—such as you will politely inform the user that you can only answer questions based on the university handbook."
 
-    // get the history of the conversation without the user query
-    const history = messages.slice(0, messages.length - 1);
-	
-    // get the context
-	const context = await retrieveContext(messages);    
-    
-    // get the last message as the user query
-	const query = messages[messages.length - 1];
+        `
+    };
 
-	if (!context) {
-		query.content = `
+    /* -------------- sliding windows process with coherence check -------------- */
 
-        Query: "${query.content.toLowerCase()}"
+    // Keep only the last 3 messages to maintain a manageable context window
+    const recentMessages = messages.slice(-3);
 
-        Tell the me that the university handbook does not have information about the query unfortunately. Add a lot of emojis. Tell me about you and your purpose. Ask for questions related to the university handbook instead. 
+    // Extract the current user query (last message)
+    const currentQuery = recentMessages[recentMessages.length - 1];
+
+    // Initialize context with the current query
+    let context = `${currentQuery.role}: ${currentQuery.content}`;
+
+    // Initialize history and coherence flag
+    let messageHistory: Message[] = [];
+
+    // Check if we have enough messages to establish conversational history
+    if (recentMessages.length === 3) {
+        const previousQuery = recentMessages[0];
+        messageHistory = recentMessages.slice(0, 2);
         
-        `;
-	} else {
-		query.content += `
-       
-        Provide and answer by only using the university handbook context with an informative and detailed response. Always add a lot of emojis. Do not give external links that are not in the handbook. If the university handbook context does not have info about the query, refuse to answer even if its general knowledge, instead remind me about your purpose and ask me for context related questions in the university handbook.
-
-        Query: "${query.content.toLowerCase()}"       
-
-        Context: "${context}"
+        // Determine if current query is related to previous conversation
+        const isCoherent = await fetchCoherence(previousQuery.content, currentQuery.content);
         
-        `;
-	}
+        if (isCoherent) {
+            // If queries are related, use the full conversation context
+            context = recentMessages.map(message => `${message.role}: ${message.content}`).join('\n\n');
+        }
+        
+        console.log('Previous query:', previousQuery.content);
+        console.log('Current query:', currentQuery.content);
+        console.log('Coherence:', isCoherent);
+    }
+
+    // Retrieve relevant information from database
+    const documentContent = await fetchDatabase(context);
+
+    // Enhance the query with context information
+    currentQuery.content = `
+    You will provide informative and detailed responses using plenty of emojis to keep interactions engaging. If a query is vague or outside the handbook's context scope, you will either ask for clarification or inform the user that the requested information is not available within the handbook.
+
+    Query: "${currentQuery.content.toLowerCase()}"
     
-	const output = [ system, ...history, query ];
-    return output;
+    Context: "${documentContent}"
+    `;
+
+    return [systemMessage, ...messageHistory, currentQuery];
 }
+
 
 export default async function GenerateAssistantResponse(messages: Message[]): Promise<ReadableStream> {
 	// generate the response from the ollama API
@@ -118,12 +106,21 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
 		// faster responses, short response and less robust
 		// more informative due to large context window
 		// acts like a character when requested
-		model: 'gemma2:2b',
+        // will often answer general questions
+        // no system prompt 
+        // https://ai.google.dev/gemma/docs/core/prompt-structure
+        model: "gemma2:2b-instruct-q4_0"
+        // model: 'gemma2:2b',
+
+        // almost like gemma2 but too much information
+        // still answers general questions
+        // model: 'gemma3:1b'
 
 		// faster responses like gemma, but more interactive
 		// small context window strict and less informative
 		// acts and like a character when requested
-		// model: 'llama3.2',
+        // model: 'llama3.2'
+        // model: 'llama3.2:3b-instruct-q4_0',
 
 		// interactive and informative responses,
 		// best robust but slow
@@ -142,6 +139,8 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
 		// never again it does random sht
 		// model: 'phi3.5',
 	});
+
+    console.log(stream);
 
 	// create a readable stream object for the frontend
 	const readableStream = new ReadableStream({
