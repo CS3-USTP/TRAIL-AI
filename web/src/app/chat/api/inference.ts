@@ -84,9 +84,9 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     
     Context: "${documentContent}"
 
-    Always add a lot of emojies. Provide accurate and concise response to the query USING ONLY INFORMATION FROM THE HANDBOOK CONTEXT that the university provided. It focuses on policies, guidelines, and regulations of USTP.
+    Always add a lot of emojies. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT INFORMATION FROM THE HANDBOOK CONTEXT that the university provided. It focuses on policies, guidelines, and regulations of USTP.
     
-    If the query is unclear, off-topic, or not handbook context related, say the information is not available and ask for clarification or context related questions instead then remind me of your purpose. YOU ARE NOT ALLOWED TO ANSWER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
+    If the query is unclear, off-topic, or not context related, refuse to answer and say that you do not know. DO NOT ANSWER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE HANDBOOK CONTEXT.
     `;
 
     return [systemMessage, ...messageHistory, currentQuery];
@@ -100,8 +100,8 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
 		stream: true,
 		messages: await processMessages(messages),
 		options: { 
-            temperature: 0.8, // more deterministic responses and focused on the context
-            top_p: 0.8 // ensures relevant responses while maintaining diversity 
+            temperature: 0.7, // more deterministic responses and focused on the context
+            top_p: 0.7 // ensures relevant responses while maintaining diversity 
         },
 
 		// faster responses, short response and less robust
