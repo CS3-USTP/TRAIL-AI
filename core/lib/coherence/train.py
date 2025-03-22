@@ -32,12 +32,12 @@ def main():
             })
 
         # save the result to json file
-        with open("lib/coherence/out/results.json", "w") as f:
+        with open("lib/coherence/data/results.json", "w") as f:
             json.dump(output, f, indent=4)                
               
               
     # open the result file
-    with open("lib/coherence/out/results.json") as f:
+    with open("lib/coherence/data/results.json") as f:
         results = json.load(f)
         
         X = []
@@ -47,7 +47,7 @@ def main():
             Y.append(result["coherence"])
             
         logistic_model = train_logistic_model(X, Y, 0.2)
-        dump(logistic_model, "lib/coherence/out/model.joblib")
+        dump(logistic_model, "models/coherence.joblib")
         
         print("Model trained and saved successfully.")
 
