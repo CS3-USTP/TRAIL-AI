@@ -82,11 +82,11 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     currentQuery.content = `
     Query: "${currentQuery.content.toLowerCase()}"
     
-    Context: "${documentContent}"
+    Handbook: "${documentContent}"
 
-    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on policies, guidelines, and regulations of USTP.
+    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on policies, guidelines, procedures, regulations, and expectations for students and faculty within USTP.
     
-    If the query is not context related, strictly refuse to answer, say that you do not know, discuss why, clarify the query if its related to the handbook, and direct me to appropriate resources instead. DO NOT ANSWER OTHER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE HANDBOOK CONTEXT.
+    If a query is unrelated to the handbook, strictly decline to answer. Clearly state that you do not know, explain why, ask for clarification if needed, and guide me to relevant resources instead.
     `;
 
     return [systemMessage, ...messageHistory, currentQuery];
