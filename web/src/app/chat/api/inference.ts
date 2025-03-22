@@ -84,7 +84,7 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     
     Context: "${documentContent}"
 
-    Provide accurate and concise response to the query USING ONLY INFORMATION FROM THE HANDBOOK CONTEXT that the university provided. It focuses on policies, guidelines, and regulations of USTP.
+    Always add a lot of emojies. Provide accurate and concise response to the query USING ONLY INFORMATION FROM THE HANDBOOK CONTEXT that the university provided. It focuses on policies, guidelines, and regulations of USTP.
     
     If the query is unclear, off-topic, or not handbook context related, say the information is not available and ask for clarification or context related questions instead then remind me of your purpose. YOU ARE NOT ALLOWED TO ANSWER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE CONTEXT.
     `;
