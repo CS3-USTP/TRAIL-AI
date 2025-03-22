@@ -84,9 +84,9 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     
     Context: "${documentContent}"
 
-    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on policies, guidelines, and regulations of USTP.
+    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on policies, guidelines, and regulations of USTP.
     
-    If the query off-topic or not context related, strictly refuse to answer and say that you do not know, clarify the query if its related to the handbook, and direct me to appropriate resources instead. DO NOT ANSWER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE HANDBOOK CONTEXT.
+    If the query is not context related, strictly refuse to answer and say that you do not know, clarify the query if its related to the handbook, and direct me to appropriate resources instead. DO NOT ANSWER OTHER GENERAL KNOWLEDGE THAT IS BEYOND THE SCOPE OF THE HANDBOOK CONTEXT.
     `;
 
     return [systemMessage, ...messageHistory, currentQuery];
