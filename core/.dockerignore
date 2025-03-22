@@ -2,7 +2,8 @@ __pycache__
 chroma.log
 db/
 venv/
-models/*/
+models/all-mpnet-base-v2
+models/mxbai-rerank-xsmall-v1
 scripts/query.py
 scripts/plotter.py
 lib/coherence/data
