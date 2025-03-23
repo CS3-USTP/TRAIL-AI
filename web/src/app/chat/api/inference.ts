@@ -15,7 +15,7 @@ const DEBUG = {
 
 // API URLs
 const GEN_URL = DEBUG.LOCAL ? 'http://localhost:11434' : 'http://ollama:11434';
-const PIPE_URL = DEBUG.LOCAL? 'http://localhost:8000' : 'http://51.79.161.130:80';
+const PIPE_URL = DEBUG.LOCAL ? 'http://localhost:8000' : 'http://51.79.161.130:80';
 const ollama = new Ollama({ host: GEN_URL });
 
 debugLog(3, 'CONFIG', `Initialized GEN_URL=${GEN_URL}, PIPE_URL=${PIPE_URL}`);
@@ -23,7 +23,7 @@ debugLog(3, 'CONFIG', `Initialized GEN_URL=${GEN_URL}, PIPE_URL=${PIPE_URL}`);
 
  /* ------------------------- Debug utility functions ------------------------ */
 
-function debugLog(level: number, section: string, message: string, data?: any): void {
+function debugLog(level: number, section: string, message: string, data?: unknown): void {
   if (!DEBUG.ENABLED || level > DEBUG.LEVEL) return;
   
   const levels = ['NONE', 'ERROR', 'WARN', 'INFO', 'VERBOSE', 'TRACE'];
