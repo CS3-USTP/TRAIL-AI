@@ -3,10 +3,17 @@ import { Message } from 'ollama';
 import { Response } from '@/types/core';
 import { Coherence } from '@/types/core';
 
-const ollama = new Ollama({ host: 'http://ollama:11434' });
+
+// const GEN_URL = 'http://localhost:11434';
+// const PIPE_URL = 'http://localhost:8000';
+
+const GEN_URL = 'http://ollama:11434';
+const PIPE_URL = 'http://51.79.161.130:80';
+
+const ollama = new Ollama({ host: GEN_URL });
 
 async function fetchDatabase(query: string): Promise<string> {
-    const chroma_api = 'http://51.79.161.130/semantic-search';
+    const chroma_api = PIPE_URL+'/semantic-search';
 
     const response = await fetch(chroma_api, {
         method: 'POST',
@@ -21,7 +28,7 @@ async function fetchDatabase(query: string): Promise<string> {
 
 
 async function fetchCoherence(premise: string, hypothesis: string): Promise<boolean> {
-    const coherence_api = 'http://51.79.161.130/coherence-check';
+    const coherence_api = PIPE_URL+'/coherence-check';
 
     const response = await fetch(coherence_api, {
         method: 'POST',
@@ -84,9 +91,9 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     
     Handbook: "${documentContent}"
 
-    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on policies, guidelines, procedures, regulations, and expectations for students and faculty within USTP.
+    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on insights, policies, guidelines, procedures, regulations, and expectations for students and faculty within USTP.
     
-    If a query is unrelated to the handbook, strictly decline to answer. Clearly state that you do not know, explain why, ask for clarification if needed, and guide me to relevant resources instead.
+    IF AN ANSWER IN THE HANDBOOK CONTEXT IS NOT AVAILABLE, strictly decline to answer by saying that the information is unavailable, discuss to me the reason then ask for related clarification if needed, then guide me to relevant resources for the query instead.
     `;
 
     return [systemMessage, ...messageHistory, currentQuery];
@@ -110,7 +117,7 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
         // will often answer general questions
         // no system prompt 
         // https://ai.google.dev/gemma/docs/core/prompt-structure
-        model: "gemma2:2b-instruct-q4_0"
+        model: "gemma2:2b-instruct-q5_1"
         // model: 'gemma2:2b',
 
         // almost like gemma2 but too much information

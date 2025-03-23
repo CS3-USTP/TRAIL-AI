@@ -4,9 +4,9 @@
 
 -  ⚙️ **Ollama** - For running LLMs
 -  📊 **ChromaDB** - For data ingestion
--  🔮 **gemma2:2b** - For generation
+-  🔮 **gemma2:2b-instruct-q5_1** - For generation
 -  🧠 **all-mpnet-base-v2** - For embeddings
--  🔰 **mxbai-rerank-large-v1** - For reranking
+-  🔰 **mxbai-rerank-xsmall-v1** - For reranking
 -  💬 **nli-deberta-v3-base** - For coherence
 -  🐍 **Python 3.12** - For ml apis
 -  🦕 **Node.js 23.10.0** - For JS runtime
