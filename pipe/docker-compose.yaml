@@ -1,7 +1,7 @@
 services:
-  core:
+  pipe:
     build: .
-    container_name: core
+    container_name: pipe
     networks:
       - network
     ports:
