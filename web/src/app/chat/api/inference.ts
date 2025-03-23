@@ -3,7 +3,6 @@ import { Message } from 'ollama';
 import { Response } from '@/types/core';
 import { Coherence } from '@/types/core';
 
-
 // const GEN_URL = 'http://localhost:11434';
 // const PIPE_URL = 'http://localhost:8000';
 
@@ -91,9 +90,9 @@ async function processMessages(messages: Message[]): Promise<Message[]> {
     
     Handbook: "${documentContent}"
 
-    Always add a lot of emojis. Provide direct, accurate, and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on insights, policies, guidelines, procedures, regulations, and expectations for students and faculty within USTP.
+    Always add a lot of emojis. Discuss and analyze with direct, accurate and concise response to the query USING ONLY RELEVANT AND RELATED INFORMATION FROM THE HANDBOOK CONTEXT. The university provided the handbook context to you. It focuses on insights, policies, guidelines, procedures, regulations, and expectations for students and faculty within USTP.
     
-    IF AN ANSWER IN THE HANDBOOK CONTEXT IS NOT AVAILABLE, strictly decline to answer by saying that the information is unavailable, discuss to me the reason then ask for related clarification if needed, then guide me to relevant resources for the query instead.
+    IF AN ANSWER IN THE HANDBOOK CONTEXT IS NOT AVAILABLE, strictly decline to answer by saying that the information is unavailable, then guide me to relevant resources for the query instead.
     `;
 
     return [systemMessage, ...messageHistory, currentQuery];
@@ -107,8 +106,8 @@ export default async function GenerateAssistantResponse(messages: Message[]): Pr
 		stream: true,
 		messages: await processMessages(messages),
 		options: { 
-            temperature: 0.7, // more deterministic responses and focused on the context
-            top_p: 0.7 // ensures relevant responses while maintaining diversity 
+            temperature: 0.78, // more deterministic responses and focused on the context
+            top_p: 0.78 // ensures relevant responses while maintaining diversity 
         },
 
 		// faster responses, short response and less robust
