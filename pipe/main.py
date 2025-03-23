@@ -30,9 +30,9 @@ DEBUG_LEVEL = DebugLevel.INFO
 def debug_print(level: DebugLevel, message: str, duration: Optional[float] = None):
     """Print debug messages with time, level and optional duration."""
     if level <= DEBUG_LEVEL:
-        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3] + " ms"
         level_str = f"[{level.name}]".ljust(9)
-        duration_str = f" ({duration:.4f}s)" if duration is not None else ""
+        duration_str = f" ({duration*1000:.2f} ms)" if duration is not None else ""
         print(f"{timestamp} {level_str} {message}{duration_str}")
 
 # ---------------------------- Initialize FastAPI ---------------------------- #
