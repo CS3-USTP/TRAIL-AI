@@ -32,7 +32,7 @@ relation_model = CrossEncoder(
 )
 
 reranker_model = CrossEncoder(
-    'models/mxbai-rerank-xsmall-v1',
+    'models/mxbai-rerank-base-v1',
     trust_remote_code=True,
     device=device
 )
