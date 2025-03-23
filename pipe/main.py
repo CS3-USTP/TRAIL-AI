@@ -25,7 +25,7 @@ class DebugLevel(IntEnum):
     TRACE = 5
 
 # Set the debug level here (can be changed at runtime)
-DEBUG_LEVEL = DebugLevel.TRACE
+DEBUG_LEVEL = DebugLevel.INFO
 
 def debug_print(level: DebugLevel, message: str, duration: Optional[float] = None):
     """Print debug messages with time, level and optional duration."""
@@ -34,23 +34,6 @@ def debug_print(level: DebugLevel, message: str, duration: Optional[float] = Non
         level_str = f"[{level.name}]".ljust(9)
         duration_str = f" ({duration:.4f}s)" if duration is not None else ""
         print(f"{timestamp} {level_str} {message}{duration_str}")
-
-def debug_timer(func):
-    """Decorator to measure and log function execution time."""
-    async def wrapper(*args, **kwargs):
-        func_name = func.__name__
-        debug_print(DebugLevel.DEBUG, f"Starting {func_name}")
-        start_time = time.time()
-        try:
-            result = await func(*args, **kwargs)
-            duration = time.time() - start_time
-            debug_print(DebugLevel.DEBUG, f"Completed {func_name}", duration)
-            return result
-        except Exception as e:
-            duration = time.time() - start_time
-            debug_print(DebugLevel.ERROR, f"Error in {func_name}: {str(e)}", duration)
-            raise
-    return wrapper
 
 # ---------------------------- Initialize FastAPI ---------------------------- #
 
@@ -191,7 +174,6 @@ async def read_root() -> Dict[str, str]:
 
 
 @app.post("/coherence-check")
-@debug_timer
 async def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
     """Check the coherence of the query with the provided context."""
     debug_print(DebugLevel.INFO, f"Coherence check called with: premise={request.premise[:50]}..., hypothesis={request.hypothesis[:50]}...")
@@ -228,7 +210,6 @@ async def coherence_check(request: CoherenceRequest) -> Dict[str, Any]:
 
 
 @app.get("/query-metadata/{doc_id}")
-@debug_timer
 async def query_metadata(doc_id: str) -> Dict[str, Any]:
     """Retrieve a document by its metadata ID."""
     debug_print(DebugLevel.INFO, f"Metadata query for document ID: {doc_id}")
@@ -249,7 +230,6 @@ async def query_metadata(doc_id: str) -> Dict[str, Any]:
 
 
 @app.post("/semantic-search")
-@debug_timer
 async def semantic_search(request: QueryRequest) -> JSONResponse:
     """Perform semantic search and return only relevant results."""
     debug_print(DebugLevel.INFO, f"Semantic search called with query: {request.query}")
@@ -258,13 +238,16 @@ async def semantic_search(request: QueryRequest) -> JSONResponse:
         query = request.query
         debug_print(DebugLevel.INFO, f"Creating semantic search pipeline for query: {query}")
         pipeline = SemanticSearchPipeline(query)
+        
+        search_start = time.time()
         search_results = await pipeline.execute()
+        search_duration = time.time() - search_start
         
         if search_results.get("success", False):
             num_results = len(search_results.get("reference", "").split(",")) if search_results.get("reference") else 0
-            debug_print(DebugLevel.INFO, f"Search complete with {num_results} results")
+            debug_print(DebugLevel.INFO, f"Search complete with {num_results} results", search_duration)
         else:
-            debug_print(DebugLevel.WARNING, f"Search unsuccessful: {search_results.get('message', 'Unknown error')}")
+            debug_print(DebugLevel.WARNING, f"Search unsuccessful: {search_results.get('message', 'Unknown error')}", search_duration)
             
         return JSONResponse(
             content=search_results,
@@ -293,7 +276,6 @@ class SemanticSearchPipeline:
         self.results = {}
         debug_print(DebugLevel.DEBUG, f"Initialized SemanticSearchPipeline with query: {query}")
     
-    @debug_timer
     async def execute(self) -> Dict[str, Any]:
         """Execute the complete search pipeline."""
         debug_print(DebugLevel.INFO, f"Executing search pipeline for query: {self.query}")
@@ -322,7 +304,6 @@ class SemanticSearchPipeline:
         
         return format_result
     
-    @debug_timer
     async def retrieve_documents(self) -> None:
         """Retrieve relevant documents based on embedding similarity."""
         debug_print(DebugLevel.DEBUG, f"Generating embedding for query: {self.query}")
@@ -372,7 +353,6 @@ class SemanticSearchPipeline:
         
         self.results = filtered_results
     
-    @debug_timer
     async def rerank_documents(self) -> None:
         """Rerank retrieved documents using the reranker model."""
         documents = self.results.get("documents", [])
@@ -555,3 +535,30 @@ class SemanticSearchPipeline:
             result["scores"] = filtered_scores
             
         return result
+
+
+# Add debug middleware to log all incoming requests
+@app.middleware("http")
+async def log_requests(request, call_next):
+    start_time = time.time()
+    method = request.method
+    url = request.url.path
+    
+    debug_print(DebugLevel.INFO, f"Request: {method} {url}")
+    
+    # Extract and log request body for debugging
+    try:
+        body = await request.body()
+        if body:
+            body_text = body.decode()
+            debug_print(DebugLevel.DEBUG, f"Request body: {body_text[:200]}...")
+    except Exception as e:
+        debug_print(DebugLevel.ERROR, f"Could not read request body: {str(e)}")
+    
+    response = await call_next(request)
+    
+    duration = time.time() - start_time
+    status_code = response.status_code
+    debug_print(DebugLevel.INFO, f"Response: {status_code} for {method} {url}", duration)
+    
+    return response
